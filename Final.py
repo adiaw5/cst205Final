@@ -33,6 +33,9 @@
 # |             |\           |\             |\
 # |_____________|____________|______________|
 
+import os
+import tempfile
+import urllib
 
 title = """
 ####
@@ -545,3 +548,24 @@ def eventMakeKey(house, items, hero):
     inventory.append('key')
 
     showInformation("You take all three pieces, and make a KEY out of them... You think you know where to USE it") 
+
+####
+# Utility Functions
+####
+
+def loadAsset(type, name):
+  """ Load assets from the remote repo.
+  Args:
+    type (string): The type of asset to load (images, sounds).
+    name (string): The name of the asset to load.
+  """
+  cwd = tempfile.gettempdir()
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assests/" + type
+  
+  testfile = urllib.URLopener()
+  testfile.retrieve(url + name, cwd + name)
+  
+  if type == 'sounds':
+    return makeSound(cwd + name)
+  elif type == 'images':
+    return makeImage(cwd + name)
