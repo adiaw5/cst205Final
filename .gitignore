@@ -1,0 +1,5 @@
+**/*.pybak
+**/*.pylog
+**/*.pyc
+**/personal
+.vs
