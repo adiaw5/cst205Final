@@ -33,6 +33,7 @@
 # |             |\           |\             |\
 # |_____________|____________|______________|
 
+import copy
 import os
 import tempfile
 import urllib
@@ -65,7 +66,7 @@ but nothing looks familiar to you. You're dressed in formal
 wear. You try to get your bearings, you EXAMINE the room.
 """
 
-houseLayout = {
+houseMaster = {
   "bedroom" : {
     'examine' : """=========== The Bedroom ===========
 A plain looking room with a messy bed, a night stand, a desk and a chair.
@@ -77,7 +78,10 @@ is also a door open in the EAST side leading to a courtyard.
       'north' : 'hallway',
       'east'  : 'courtyard',
     },
-    'items' : ['handle']
+    'items' : ['handle'],
+    'assets': {
+      'image' : 'bedroom.jpg'
+    }
   },
 
   "courtyard" : {
@@ -91,7 +95,10 @@ bedroom, EAST is the foyer
       'east' : 'foyer'
     },
     'items' : [],
-    'events' : []
+    'events' : [],
+    'assets': {
+      'image' : 'courtyard.jpg'
+    }
   },
 
   'hallway' : {
@@ -106,7 +113,10 @@ bedroom you're familiar with but can't remember how.
       'north' : 'library',
     },
     'items' : [],
-    'events' : []
+    'events' : [],
+    'assets': {
+      'image' : 'hallway.jpg'
+    }
   },
 
   'library' : {
@@ -120,7 +130,10 @@ The arch on the EAST side seem to open into a ballroom.
       'south' : 'hallway',
     },
     'items' : ['coffee', 'bookshelf'],
-    'events' : ['eventLibrary']
+    'events' : ['eventLibrary'],
+    'assets': {
+      'image' : 'library.jpg'
+    }
   },
 
   'ballroom' : {
@@ -133,7 +146,10 @@ doors to the library WEST and the foyer SOUTH.
       'west' : 'library',
       'south' : 'foyer'
     },
-    'items' : ['teeth']
+    'items' : ['teeth'],
+    'assets': {
+      'image' : 'ballroom.jpg'
+    }
   },
 
   'foyer' : {
@@ -148,7 +164,10 @@ locked by a skeleton key.
       'west' : 'courtyard'
     },
     'items' : ['book'],
-    'events' : []
+    'events' : [],
+    'assets': {
+      'image' : 'foyer.jpg'
+    }
   },
   'laboratory' : {
     'examine' : """=========== The Laboratory ===========
@@ -158,31 +177,54 @@ The passageway SOUTH leads to the library.
     'move' : {
       'south' : 'library'
     },
-    'items' : ['neck']
+    'items' : ['neck'],
+    'assets': {
+      'image' : 'bedroom.jpg'
+    }
   }
 }
 
-items = {
+itemsMaster = {
   'handle' : {
-    'examine' : "The HANDLE of a key... It looks like it's missing the NECK and TEETH",
-    'take' : "You gently place the HANDLE in your pocket.",
-    'location' : "You see a round loop like a HANDLE. Maybe you can TAKE it."
+    'actions' : {
+      'examine' : "The HANDLE of a key... It looks like it's missing the NECK and TEETH",
+      'take' : "You gently place the HANDLE in your pocket.",
+    },
+    'location' : "You see a round loop like a HANDLE. Maybe you can TAKE it.",
+    'assets' : {
+      'image' : 'Inv_misc_key_04.jpg'
+    }
   },
   'neck' : {
-    'examine' : "The NECK of a key. A long and shiny bronze bar. Maybe you can TAKE it.",
-    'take' : "You gently place the NECK in your pocket.",
-    'location' : "The NECK of a key seems to be resting at your reach."
+    'actions' : {
+      'examine' : "The NECK of a key. A long and shiny bronze bar. Maybe you can TAKE it.",
+      'take' : "You gently place the NECK in your pocket.",
+    },
+    'location' : "The NECK of a key seems to be resting at your reach.",
+    'assets' : {
+      'image' : 'Inv_misc_key_07.jpg'
+    }
   },
   'teeth' : {
-    'examine' : "The TEETH of a key. They seem to fit perfectly a skeleton lock.",
-    'take' : "You gently place the TEETH in your pocket.",
-    'location' : "You can see the TEETH of a key shinning."
+    'actions' : {
+      'examine' : "The TEETH of a key. They seem to fit perfectly a skeleton lock.",
+      'take' : "You gently place the TEETH in your pocket.",
+    },
+    'location' : "You can see the TEETH of a key shinning.",
+    'assets' : {
+      'image' : 'Inv_misc_key_13.jpg'
+    }
   },
   'book' : {
-    'examine' : "A heavy, wornout book. The title reads: Experiments.",
-    'take': "You take the book...",
-    'put': "You gently place the book...",
-    'location': "You notice a BOOK that reads 'Experiments'."
+    'actions' : {
+      'examine' : "A heavy, wornout book. The title reads: Experiments.",
+      'take': "You take the book...",
+      'put': "You gently place the book...",
+    },
+    'location': "You notice a BOOK that reads 'Experiments'.",
+    'assets' : {
+      'image' : 'Inv_misc_book_11.jpg'
+    }
   },
   'coffee' : {
     'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
@@ -194,16 +236,31 @@ items = {
     'location' : "A BOOKSHELF lines the north wall from floor to celing."
   },
   'key' : {
-    'examine' : "A shiny skeleton key. It would fit nicely in a door. But where can you USE it?",
-    'use' : "you USE the key and jiggle it."
+    'actions' : {
+      'examine' : "A shiny skeleton key. It would fit nicely in a door. But where can you USE it?",
+      'use' : "you USE the key and jiggle it."
+    },
+    'assets' : {
+      'image' : 'Inv_misc_key_15.jpg'
+    }
   }
 }
 
-hero = {
+heroMaster = {
   'location' : 'bedroom',
   'inventory' : [],
   'moves' : 50,
   'name' : ''
+}
+
+configsMaster = {
+  'hud' : {
+    'assets' : {
+      'image' : 'hud.jpg'
+    },
+    'iconPos' : [37, 100],
+    'textPos' : [504, 30],
+  }
 }
 
 def start():
@@ -215,7 +272,12 @@ def start():
   # Print all initial information for the user.
   showInformation(title + instructions)
   showInformation(introduction)
-  examine(houseLayout, items, hero)
+  examine(houseMaster, itemsMaster, heroMaster)
+
+  game = initialize()
+  house = game['house']
+  items = game['items']
+  hero = game['hero']
 
   # Start the main loop.
   hero['state'] = 'playing'
@@ -260,7 +322,7 @@ def start():
           break
 
       # Execute action.
-      doAction(args[0], args[1], houseLayout, items, hero)
+      doAction(args[0], args[1], house, items, hero)
 
   if  hero['state'] == "success":
     printNow("%s! You have finally made out of the house! You have won the game, %s!" % (hero['name'], hero['name']))
@@ -296,10 +358,10 @@ def doAction(action, object, house, items, hero):
     # performed in the room or an object.
     if not object and action in heroRoom:
       printNow(heroRoom[action])
-    elif object in heroRoom['items'] and action in items[object]: 
-      printNow(items[object][action])
-    elif object in hero['inventory'] and action in items[object]: 
-      printNow(items[object][action])
+    elif object in heroRoom['items'] and action in items[object]['actions']: 
+      printNow(items[object]['actions'][action])
+    elif object in hero['inventory'] and action in items[object]['actions']: 
+      printNow(items[object]['actions'][action])
     else:
       # This action cannot be performed.
       printNow("%s, you don't know how to %s that object" % (hero['name'], action.upper()))
@@ -315,7 +377,6 @@ def checkEvents(house, items, hero):
     items (dictionary): The list of all items in the house.
     hero (dictionary): The hero performing the action.
   """
-  
   heroRoom = house[hero['location']]
   
   if 'events' in heroRoom:
@@ -334,7 +395,6 @@ def move(house, direction, hero):
     direction (string): The direction the user wishes to move.
     hero (dictionary):  The hero that needs to move.
   """
-
   heroRoom = hero['location']
   validDirections = house[heroRoom]['move'] 
 
@@ -347,7 +407,7 @@ def move(house, direction, hero):
 
     newRoom = validDirections[direction]
     hero['location'] = newRoom
-    examine(houseLayout, items, hero)
+    examine(house, items, hero)
   else:
     #Invalid direction entered
     if direction:
@@ -395,8 +455,8 @@ def examine(house, items, hero, object = False):
   # Check if the room or user have the object.
   
   if object in hero['inventory'] or object in heroRoom['items']:
-    if 'examine' in items[object]:
-      printNow(items[object]["examine"])
+    if 'examine' in items[object]['actions']:
+      printNow(items[object]['actions']['examine'])
       return
 
   printNow("Strange... you cannot examine that.")
@@ -438,10 +498,10 @@ def take(house, items, hero, object):
   """
   heroRoom = house[hero['location']]
   if object in heroRoom['items']:
-    if 'take' in items[object]:
+    if 'take' in items[object]['actions']:
       hero['inventory'].append(object)
       heroRoom['items'].remove(object)
-      printNow(items[object]['take'])
+      printNow(items[object]['actions']['take'])
     else:
       printNow("You cannot take the %s from this room" % object)
   else:
@@ -457,10 +517,10 @@ def put(house, items, hero, object):
   """
   heroRoom = house[hero['location']]
   if object in hero['inventory']:
-    if 'put' in items[object]:
+    if 'put' in items[object]['actions']:
       heroRoom['items'].append(object)
       hero['inventory'].remove(object)
-      printNow(items[object]['put'])
+      printNow(items[object]['actions']['put'])
     else:
       printNow("You cannot PUT the %s!" % object)
   else:
@@ -476,8 +536,8 @@ def use(house, items, hero, object = False):
   """
   heroRoom = house[hero['location']]
   if object in hero['inventory']:
-    if 'use' in items[object]:
-      printNow(items[object]['use'])
+    if 'use' in items[object]['actions']:
+      printNow(items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
         heroRoom['events'].append('eventOpenExit')
     else:
@@ -553,19 +613,51 @@ def eventMakeKey(house, items, hero):
 # Utility Functions
 ####
 
-def loadAsset(type, name):
+def initialize():
+   game = {}
+   game['house'] = copy.deepcopy(houseMaster)
+   game['hero'] = copy.deepcopy(heroMaster)
+   game['items'] = copy.deepcopy(itemsMaster)
+   game['images'] = {}
+   game['sounds'] = {}
+
+   loadAssets(game, game)
+
+   return game
+
+def loadAssets(dic, game):
+  for key, value in dic.items():
+    if type(value) is dict:
+      if 'assets' in value:
+        loadAsset(value, game)
+      else:
+        loadAssets(value, game)
+
+def loadAsset(assetDic, game):
+  if 'image' in assetDic['assets']:
+    name = assetDic['assets']['image']
+    if not name in game['images']:
+      game['images'][name] = downloadAsset('images', name)
+  if 'sound' in assetDic['assets']:
+    name = assetDic['assets']['sound']
+    if not name in game['sounds']:
+      game['images'][name] = downloadAsset('sounds', name)
+
+def downloadAsset(type, name):
   """ Load assets from the remote repo.
   Args:
     type (string): The type of asset to load (images, sounds).
     name (string): The name of the asset to load.
   """
   cwd = tempfile.gettempdir()
-  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assests/" + type
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/jdelgado/assets/assets/%s/" % type
+  # url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assests/%s/" % type
   
   testfile = urllib.URLopener()
+  printNow("Loading now: %s" % name)
   testfile.retrieve(url + name, cwd + name)
   
   if type == 'sounds':
     return makeSound(cwd + name)
   elif type == 'images':
-    return makeImage(cwd + name)
+    return makePicture(cwd + name)
