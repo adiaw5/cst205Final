@@ -250,7 +250,8 @@ heroMaster = {
   'location' : 'bedroom',
   'inventory' : [],
   'moves' : 50,
-  'name' : ''
+  'name' : '',
+  'textQueue' : []
 }
 
 configsMaster = {
@@ -282,7 +283,10 @@ def start():
   # Start the main loop.
   hero['state'] = 'playing'
   while(hero['state'] == 'playing'):
-    
+
+    # Empty the queue.
+    hero['textQueue'] = []
+
     # Prompt user for a name until one is provided.
     if not hero['name']:
       name = requestString("Please enter your name: ").strip().capitalize()
@@ -292,15 +296,15 @@ def start():
     # Process user inputs.
     user_response = requestString("What would like to do? ")
     if user_response == None:
-      printNow("Please enter an action or QUIT to exit")
+      addToTextQueue(hero, "Please enter an action or QUIT to exit")
       continue
       
     user_response = user_response.lower().strip()
     if len(user_response) == 0:
-      printNow("Please enter an action or QUIT to exit")
+      addToTextQueue(hero, "Please enter an action or QUIT to exit")
       continue
       
-    printNow("\n>>>You entered: "+user_response+"\n")
+    addToTextQueue(hero, "\n>>>You entered: "+user_response+"\n")
     args = user_response.split()
 
     # Game logic.
@@ -323,13 +327,16 @@ def start():
 
       # Execute action.
       doAction(args[0], args[1], house, items, hero)
+      checkEvents(house, items, hero)
+      printNow("\n".join(hero['textQueue']))
+
 
   if  hero['state'] == "success":
-    printNow("%s! You have finally made out of the house! You have won the game, %s!" % (hero['name'], hero['name']))
+    showInformation("%s! You have finally made out of the house! You have won the game, %s!" % (hero['name'], hero['name']))
   elif  hero['state'] == "quit":
-    printNow("Thank you for playing, %s. Please come again!" % hero['name'])
+    showInformation("Thank you for playing, %s. Please come again!" % hero['name'])
   else:
-    printNow("Sorry %s! You have run out of moves, please try again!" % hero['name'])
+    showInformation("Sorry %s! You have run out of moves, please try again!" % hero['name'])
       
 def doAction(action, object, house, items, hero):
   """ Performs an action on an object or room based on user input.
@@ -357,16 +364,14 @@ def doAction(action, object, house, items, hero):
     # Execute actions based on wether they can be
     # performed in the room or an object.
     if not object and action in heroRoom:
-      printNow(heroRoom[action])
+      addToTextQueue(hero, heroRoom[action])
     elif object in heroRoom['items'] and action in items[object]['actions']: 
-      printNow(items[object]['actions'][action])
+      addToTextQueue(hero, items[object]['actions'][action])
     elif object in hero['inventory'] and action in items[object]['actions']: 
-      printNow(items[object]['actions'][action])
+      addToTextQueue(hero, items[object]['actions'][action])
     else:
       # This action cannot be performed.
-      printNow("%s, you don't know how to %s that object" % (hero['name'], action.upper()))
-
-  checkEvents(house, items, hero)
+      addToTextQueue(hero, "%s, you don't know how to %s that object" % (hero['name'], action.upper()))
 
 def checkEvents(house, items, hero):
   """ Loops over all the actions available
@@ -411,10 +416,10 @@ def move(house, direction, hero):
   else:
     #Invalid direction entered
     if direction:
-      printNow("%s, you cannot move in the %s direction from this room." % (hero['name'], direction.upper()))
-    printNavigation(house[heroRoom])
+      addToTextQueue(hero, "%s, you cannot move in the %s direction from this room." % (hero['name'], direction.upper()))
+    printNavigation(hero, house[heroRoom])
 
-def printNavigation(room):
+def printNavigation(hero, room):
   """Utility Function
   Prints the different directions and destinations for a room.
   Args:
@@ -422,14 +427,14 @@ def printNavigation(room):
   """
   navigation = room['move']
   if len(navigation) > 1:
-    printNow("You can see a few places you can MOVE to:")
+    addToTextQueue(hero, "You can see a few places you can MOVE to:")
   elif len(navigation) == 1:
-    printNow("You can only MOVE")
+    addToTextQueue(hero, "You can only MOVE")
   else:
-    printNow("What? How is it possible?! You're trapped... No place to MOVE!")
+    addToTextQueue(hero, "What? How is it possible?! You're trapped... No place to MOVE!")
 
   for direction, room in navigation.items():
-    printNow("  %s to the %s" % (direction.upper(), room.capitalize()))
+    addToTextQueue(hero, "  %s to the %s" % (direction.upper(), room.capitalize()))
 
 def examine(house, items, hero, object = False):
   """Action:
@@ -444,7 +449,7 @@ def examine(house, items, hero, object = False):
   location = hero['location']
   heroRoom = house[location]
   if not object or object == 'room':
-    examineRoom(heroRoom, items)
+    examineRoom(heroRoom, items, hero)
     return
 
   # Examine the hero.
@@ -456,10 +461,10 @@ def examine(house, items, hero, object = False):
   
   if object in hero['inventory'] or object in heroRoom['items']:
     if 'examine' in items[object]['actions']:
-      printNow(items[object]['actions']['examine'])
+      addToTextQueue(hero, items[object]['actions']['examine'])
       return
 
-  printNow("Strange... you cannot examine that.")
+  addToTextQueue(hero, "Strange... you cannot examine that.")
 
 def examineMe(hero):
   """Action:
@@ -467,14 +472,14 @@ def examineMe(hero):
   Args:
     hero (dictionary): The hero to examine..
   """
-  printNow("\nYou're in the %s" % hero['location'].capitalize())
+  addToTextQueue(hero, "\nYou're in the %s" % hero['location'].capitalize())
   
   if len(hero['inventory']) > 0:
-    printNow("\nYou have acquired some items:  " + ', '.join([i.upper() for i in hero['inventory']]))
+    addToTextQueue(hero, "\nYou have acquired some items:  " + ', '.join([i.upper() for i in hero['inventory']]))
     
-  printNow("\nYou have %s moves left" % hero['moves'])
+  addToTextQueue(hero, "\nYou have %s moves left" % hero['moves'])
 
-def examineRoom(room, items):
+def examineRoom(room, items, hero):
   """Action:
   Examine the hero, and print all relevant information.
   Args:
@@ -486,7 +491,7 @@ def examineRoom(room, items):
     for item in room['items']:
       if 'location' in items[item]:
         roomDescription += items[item]['location'] + "\n"
-  printNow(roomDescription)
+  addToTextQueue(hero, roomDescription)
 
 def take(house, items, hero, object):
   """ Take an item from the current room.
@@ -501,11 +506,11 @@ def take(house, items, hero, object):
     if 'take' in items[object]['actions']:
       hero['inventory'].append(object)
       heroRoom['items'].remove(object)
-      printNow(items[object]['actions']['take'])
+      addToTextQueue(hero, items[object]['actions']['take'])
     else:
-      printNow("You cannot take the %s from this room" % object)
+      addToTextQueue(hero, "You cannot take the %s from this room" % object)
   else:
-    printNow("This room does not have a %s" % object)
+    addToTextQueue(hero, "This room does not have a %s" % object)
 
 def put(house, items, hero, object):
   """ Puts an item from the user inventory, in the current room.
@@ -520,11 +525,11 @@ def put(house, items, hero, object):
     if 'put' in items[object]['actions']:
       heroRoom['items'].append(object)
       hero['inventory'].remove(object)
-      printNow(items[object]['actions']['put'])
+      addToTextQueue(hero, items[object]['actions']['put'])
     else:
-      printNow("You cannot PUT the %s!" % object)
+      addToTextQueue(hero, "You cannot PUT the %s!" % object)
   else:
-    printNow("You don't have a %s" % object)
+    addToTextQueue(hero, "You don't have a %s" % object)
 
 def use(house, items, hero, object = False):
   """ Uses an item from the user inventory in the room.
@@ -537,13 +542,13 @@ def use(house, items, hero, object = False):
   heroRoom = house[hero['location']]
   if object in hero['inventory']:
     if 'use' in items[object]['actions']:
-      printNow(items[object]['actions']['use'])
+      addToTextQueue(hero, items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
         heroRoom['events'].append('eventOpenExit')
     else:
-      printNow("You cannot USE the %s!" % object)
+      addToTextQueue(hero, "You cannot USE the %s!" % object)
   else:
-    printNow("You don't have a %s" % object)
+    addToTextQueue(hero, "You don't have a %s" % object)
 
 def eventLibrary(house, items, hero):
   """ Event
@@ -620,9 +625,7 @@ def initialize():
    game['items'] = copy.deepcopy(itemsMaster)
    game['images'] = {}
    game['sounds'] = {}
-
    loadAssets(game, game)
-
    return game
 
 def loadAssets(dic, game):
@@ -661,3 +664,6 @@ def downloadAsset(type, name):
     return makeSound(cwd + name)
   elif type == 'images':
     return makePicture(cwd + name)
+
+def addToTextQueue(hero, string):
+  hero['textQueue'].append(string)
