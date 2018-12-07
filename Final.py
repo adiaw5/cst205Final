@@ -36,6 +36,7 @@
 import copy
 import os
 import tempfile
+import time
 import urllib
 
 title = """
@@ -257,7 +258,8 @@ heroMaster = {
 configsMaster = {
   'hud' : {
     'assets' : {
-      'image' : 'hud.jpg'
+      'image' : 'hud.jpg',
+      'sound' : 'bensound-ofeliasdream.wav'
     },
     'iconPos' : [37, 100],
     'textPos' : [504, 30],
@@ -271,72 +273,96 @@ def start():
   """
 
   # Print all initial information for the user.
-  showInformation(title + instructions)
-  showInformation(introduction)
-  examine(houseMaster, itemsMaster, heroMaster)
-
   game = initialize()
   house = game['house']
   items = game['items']
   hero = game['hero']
 
   # Start the main loop.
-  hero['state'] = 'playing'
-  while(hero['state'] == 'playing'):
-
-    # Empty the queue.
-    hero['textQueue'] = []
-
+  hero['state'] = 'start'
+  while(isPlaying(game)):
     # Prompt user for a name until one is provided.
-    if not hero['name']:
-      name = requestString("Please enter your name: ").strip().capitalize()
-      hero['name'] = name
+    if hero['state'] == 'start':
+      name = requestString("Please enter your name: ")
+      if name == None:
+        hero['name'] = 'quitter'
+        hero['state'] = 'quit'
+      elif name.strip() != '':
+        name.strip().capitalize()
+        hero['name'] = name
+        hero['state'] = 'intro'
       continue
-
-    # Process user inputs.
-    user_response = requestString("What would like to do? ")
-    if user_response == None:
-      addToTextQueue(hero, "Please enter an action or QUIT to exit")
-      continue
+  
+    elif hero['state'] == 'intro':
+      showInformation(title + instructions)
+      showInformation(introduction)
+      examine(house, items, hero)
+      hero['state'] = 'playing'
       
-    user_response = user_response.lower().strip()
-    if len(user_response) == 0:
-      addToTextQueue(hero, "Please enter an action or QUIT to exit")
-      continue
-      
-    addToTextQueue(hero, "\n>>>You entered: "+user_response+"\n")
-    args = user_response.split()
+    elif hero['state'] == 'playing':
+      playGame(game)
+    
+    printNow("\n".join(hero['textQueue']))
+    # <TODO> Add scene rendering here
+    # <TODO> Add music manager here.  
+    # <TODO> THIS SHOULD GO IN THE SOUND MANAGER
+    if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
+      backgroundSound = game['config']['hud']['assets']['sound']
+      sound = game['sounds'][backgroundSound]
+      play(sound)
+      game['config']['sound_start_ts'] = time.time()
 
-    # Game logic.
-    if args[0] == "help": 
-      showInformation(instructions)
-    elif args[0] ==  "quit":
-      hero['state'] = 'quit'
-      break
-    else:
-      # Ensure there is a second argument.
-      if len(args) < 2:
-        args.append(False)
-      
-      # Count the moves.
-      if args[0] == "move":
-        hero['moves'] = hero['moves'] -1
-        if hero['moves'] == 0:
-          hero['state'] == "fail"
-          break
-
-      # Execute action.
-      doAction(args[0], args[1], house, items, hero)
-      checkEvents(house, items, hero)
-      printNow("\n".join(hero['textQueue']))
-
-
+  # <TODO> Cleanup exit function. Should stop music
   if  hero['state'] == "success":
     showInformation("%s! You have finally made out of the house! You have won the game, %s!" % (hero['name'], hero['name']))
   elif  hero['state'] == "quit":
     showInformation("Thank you for playing, %s. Please come again!" % hero['name'])
   else:
     showInformation("Sorry %s! You have run out of moves, please try again!" % hero['name'])
+
+
+def playGame(game):
+  hero = game['hero']
+  house = game['house']
+  items = game['items']
+
+  # Process user inputs.
+  user_response = requestString("What would like to do? ")
+  if user_response == None:
+    addToTextQueue(hero, "Please enter an action or QUIT to exit")
+    return
+    
+  user_response = user_response.lower().strip()
+  if len(user_response) == 0:
+    addToTextQueue(hero, "Please enter an action or QUIT to exit")
+    return
+
+ # Empty the queue.
+  hero['textQueue'] = []    
+  addToTextQueue(hero, "\n>>>You entered: "+user_response+"\n")
+  args = user_response.split()
+
+  # Game logic.
+  if args[0] == "help": 
+    showInformation(instructions)
+  elif args[0] ==  "quit":
+    hero['state'] = 'quit'
+    return
+  else:
+    # Ensure there is a second argument.
+    if len(args) < 2:
+      args.append(False)
+    
+    # Count the moves.
+    if args[0] == "move":
+      hero['moves'] = hero['moves'] -1
+      if hero['moves'] == 0:
+        hero['state'] == "fail"
+        return
+
+    # Execute action.
+    doAction(args[0], args[1], house, items, hero)
+    checkEvents(house, items, hero)
       
 def doAction(action, object, house, items, hero):
   """ Performs an action on an object or room based on user input.
@@ -619,14 +645,22 @@ def eventMakeKey(house, items, hero):
 ####
 
 def initialize():
-   game = {}
-   game['house'] = copy.deepcopy(houseMaster)
-   game['hero'] = copy.deepcopy(heroMaster)
-   game['items'] = copy.deepcopy(itemsMaster)
-   game['images'] = {}
-   game['sounds'] = {}
-   loadAssets(game, game)
-   return game
+  game = {}
+  game['house'] = copy.deepcopy(houseMaster)
+  game['hero'] = copy.deepcopy(heroMaster)
+  game['items'] = copy.deepcopy(itemsMaster)
+  game['config'] = copy.deepcopy(configsMaster)
+  game['images'] = {}
+  game['sounds'] = {}
+  loadAssets(game, game)
+
+  # Setup the necessary variables to track the duration of
+  # background sound.
+  backgroundSound = game['config']['hud']['assets']['sound']
+  sound = game['sounds'][backgroundSound]
+  game['config']['sound_duration'] = getDuration(sound)
+
+  return game
 
 def loadAssets(dic, game):
   for key, value in dic.items():
@@ -644,7 +678,7 @@ def loadAsset(assetDic, game):
   if 'sound' in assetDic['assets']:
     name = assetDic['assets']['sound']
     if not name in game['sounds']:
-      game['images'][name] = downloadAsset('sounds', name)
+      game['sounds'][name] = downloadAsset('sounds', name)
 
 def downloadAsset(type, name):
   """ Load assets from the remote repo.
@@ -652,14 +686,21 @@ def downloadAsset(type, name):
     type (string): The type of asset to load (images, sounds).
     name (string): The name of the asset to load.
   """
-  cwd = tempfile.gettempdir()
-  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/jdelgado/assets/assets/%s/" % type
-  # url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assests/%s/" % type
+  cwd = '' 
+  try:
+    cwd = tempfile.gettempdir()
+    raise Exception('Test test test')
+  except:
+    cwd = os.getcwd() + '/VASC9tmp'
+    if not os.path.isdir(cwd):
+      os.mkdir(cwd)
+      printNow("Saving files to the local directory: %s" % cwd)
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
   
   testfile = urllib.URLopener()
-  printNow("Loading now: %s" % name)
+  printNow("Loading now: %s" % url + name)
   testfile.retrieve(url + name, cwd + name)
-  
+
   if type == 'sounds':
     return makeSound(cwd + name)
   elif type == 'images':
@@ -667,3 +708,7 @@ def downloadAsset(type, name):
 
 def addToTextQueue(hero, string):
   hero['textQueue'].append(string)
+
+def isPlaying(game):
+  state = game['hero']['state']
+  return state != 'quit' and state != 'fail' and state != 'success'
