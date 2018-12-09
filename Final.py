@@ -79,7 +79,8 @@ is also a door open in the EAST side leading to a courtyard.
       'north' : 'hallway',
       'east'  : 'courtyard',
     },
-    'items' : ['handle'],
+    'items' : ['handle','lever'],
+    'events' : ['eventLibrary'],
     'assets': {
       'image' : 'bedroom.jpg'
     }
@@ -95,8 +96,8 @@ bedroom, EAST is the foyer
       'west' : 'bedroom',
       'east' : 'foyer'
     },
-    'items' : [],
-    'events' : [],
+    'items' : ['stone'],
+    'events' : ['eventLibrary'],
     'assets': {
       'image' : 'courtyard.jpg'
     }
@@ -147,7 +148,8 @@ doors to the library WEST and the foyer SOUTH.
       'west' : 'library',
       'south' : 'foyer'
     },
-    'items' : ['teeth'],
+    'items' : ['teeth','painting','cabinet'],
+    'events' : ['eventLibrary'],
     'assets': {
       'image' : 'ballroom.jpg'
     }
@@ -228,12 +230,42 @@ itemsMaster = {
     }
   },
   'coffee' : {
-    'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
-    'drink' : "You take a sip. What a delicious cup of coffee!",
+    'actions' : {
+      'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
+      'drink' : "You take a sip. What a delicious cup of coffee!"
+    },
     'location' : 'A still warm cup of COFFEE fills the room with a sweet scent.'
   },
+  'stone' : {
+    'actions' : {
+      'examine' : "A colorful stone. This colorful magic stone will reset you move count. It looks like you can USE it",
+      'use' : "you USE the colorful magic stone and reset your move count!"
+    },
+    'location' : 'A colorful stone is in the courtyard.'
+  },
+  'lever' : {
+    'actions' : {
+      'examine' : "A mysterious lever is in the room. This lever might open something. It looks like you can USE it",
+      'use' : "you USE the mysterious lever and open a window! Listen to the owls outside."
+    },   
+    'location' : 'A mysterious lever is in the room.'
+  },
+  'painting' : {
+    'actions' : {
+      'examine' : "A pantiing of the ballroom. You noticed that in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
+    },
+    'location' : 'A painting of the ballroom which displays the china cabinet closed.'
+  },
+  'cabinet' : {
+    'actions' : {
+      'examine' : "This is the china cabinet in the paintiing. This china cabinet is open. You should CLOSE the cabinet",
+      'close' : "You have closed the china cabinet."
+    }    
+  },
   'bookshelf' : {
-    'examine' : "The bookshelf is full of books about science, biology and physics... There is a gap. Something can be PUT here.",
+    'actions' : {
+      'examine' : "The bookshelf is full of books about science, biology and physics... There is a gap. Something can be PUT here."
+    },
     'location' : "A BOOKSHELF lines the north wall from floor to celing."
   },
   'key' : {
@@ -568,7 +600,7 @@ def use(house, items, hero, object = False):
     object (string): The object the action is to be performed on, if it exists.
   """
   heroRoom = house[hero['location']]
-  if object in hero['inventory']:
+  if object in hero['inventory'] or object in heroRoom['items']:
     if 'use' in items[object]['actions']:
       addToTextQueue(hero, items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
