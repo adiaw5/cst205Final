@@ -230,13 +230,17 @@ itemsMaster = {
     }
   },
   'coffee' : {
-    'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
-    'drink' : "You take a sip. What a delicious cup of coffee!",
+    'actions' : {
+      'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
+      'drink' : "You take a sip. What a delicious cup of coffee!"
+    },
     'location' : 'A still warm cup of COFFEE fills the room with a sweet scent.'
   },
   'stone' : {
-    'examine' : "A colorful stone. This colorful magic stone will reset you move count. It looks like you can USE it",
-    'use' : "you USE the colorful magic stone and reset your move count!",
+    'actions' : {
+      'examine' : "A colorful stone. This colorful magic stone will reset you move count. It looks like you can USE it",
+      'use' : "you USE the colorful magic stone and reset your move count!"
+    },
     'location' : 'A colorful stone is in the courtyard.'
   },
   'lever' : {
@@ -249,18 +253,20 @@ itemsMaster = {
   'painting' : {
     'actions' : {
       'examine' : "A pantiing of the ballroom. You noticed in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
-      },
+    },
     'location' : 'A painting of the ballroom with the china cabinet closed.'
   },
   'cabinet' : {
     'actions' : {
       'examine' : "The china cabinet in the pantiing of the ballroom. The china cabinet is open. You should CLOSED the cabinet",
       'close' : "You have closed the china cabinet."
-      },
+    },
     'location' : 'An open china cabinet.'
   },
   'bookshelf' : {
-    'examine' : "The bookshelf is full of books about science, biology and physics... There is a gap. Something can be PUT here.",
+    'actions' : {
+      'examine' : "The bookshelf is full of books about science, biology and physics... There is a gap. Something can be PUT here."
+    },
     'location' : "A BOOKSHELF lines the north wall from floor to celing."
   },
   'key' : {
