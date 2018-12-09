@@ -254,14 +254,13 @@ itemsMaster = {
     'actions' : {
       'examine' : "A pantiing of the ballroom. You noticed that in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
     },
-    'location' : 'A painting of the ballroom whhich displays the china cabinet closed.'
+    'location' : 'A painting of the ballroom which displays the china cabinet closed.'
   },
   'cabinet' : {
     'actions' : {
       'examine' : "This is the china cabinet in the paintiing. This china cabinet is open. You should CLOSE the cabinet",
       'close' : "You have closed the china cabinet."
-    },
-    'location' : 'An open china cabinet.'
+    }    
   },
   'bookshelf' : {
     'actions' : {
