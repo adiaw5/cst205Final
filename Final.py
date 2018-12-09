@@ -133,7 +133,8 @@ The arch on the EAST side seem to open into a ballroom.
     'items' : ['coffee', 'bookshelf'],
     'events' : ['eventLibrary'],
     'assets': {
-      'image' : 'library.jpg'
+      'image' : 'library.jpg',
+      'sound' : '76175__mattpavone__planetary-flyby-faster.aiff'
     }
   },
 
@@ -167,7 +168,8 @@ locked by a skeleton key.
     'items' : ['book'],
     'events' : [],
     'assets': {
-      'image' : 'foyer.jpg'
+      'image' : 'foyer.jpg',
+      'sound' : '422852__ipaddeh__door-unlocking.wav'
     }
   },
   'laboratory' : {
@@ -242,7 +244,8 @@ itemsMaster = {
       'use' : "you USE the key and jiggle it."
     },
     'assets' : {
-      'image' : 'Inv_misc_key_15.jpg'
+      'image' : 'Inv_misc_key_15.jpg',
+      'sound' : '109662__grunz__success.wav'
     }
   }
 }
@@ -252,7 +255,8 @@ heroMaster = {
   'inventory' : [],
   'moves' : 50,
   'name' : '',
-  'textQueue' : []
+  'textQueue' : [],
+  'soundQueue' : None
 }
 
 configsMaster = {
@@ -306,11 +310,7 @@ def start():
     # <TODO> Add scene rendering here
     # <TODO> Add music manager here.  
     # <TODO> THIS SHOULD GO IN THE SOUND MANAGER
-    if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
-      backgroundSound = game['config']['hud']['assets']['sound']
-      sound = game['sounds'][backgroundSound]
-      play(sound)
-      game['config']['sound_start_ts'] = time.time()
+    playSoundQueue(game)
 
   # <TODO> Cleanup exit function. Should stop music
   if  hero['state'] == "success":
@@ -338,7 +338,8 @@ def playGame(game):
     return
 
  # Empty the queue.
-  hero['textQueue'] = []    
+  hero['textQueue'] = []
+  hero['soundQueue'] = None  
   addToTextQueue(hero, "\n>>>You entered: "+user_response+"\n")
   args = user_response.split()
 
@@ -587,7 +588,7 @@ def eventLibrary(house, items, hero):
   if 'book' in house['library']['items']:
     # Remove the event so it cannot be triggered again.
     house['library']['events'].remove('eventLibrary')
-
+    hero['soundQueue'] = house['library']['assets']['sound']
     # Update the house data.
     house['library']['move']['north'] = "laboratory"
     house['library']['examine'] = """=========== The Library ===========
@@ -620,7 +621,7 @@ the famous courtyard.
 The SOUTH door is now unlocked.
 
 """
-
+  hero['soundQueue'] = house['foyer']['assets']['sound']
   showInformation("SOUTH, you hear the sound of a door unlocking.")
 
 def eventMakeKey(house, items, hero):
@@ -637,6 +638,7 @@ def eventMakeKey(house, items, hero):
     inventory.remove('neck')
     inventory.remove('teeth')
     inventory.append('key')
+    hero['soundQueue'] = itemsMaster['key']['assets']['sound']
 
     showInformation("You take all three pieces, and make a KEY out of them... You think you know where to USE it") 
 
@@ -691,7 +693,7 @@ def downloadAsset(type, name):
     cwd = tempfile.gettempdir()
     raise Exception('Test test test')
   except:
-    cwd = os.getcwd() + '/VASC9tmp'
+    cwd = os.getcwd() + '\VASC9tmp'
     if not os.path.isdir(cwd):
       os.mkdir(cwd)
       printNow("Saving files to the local directory: %s" % cwd)
@@ -712,3 +714,13 @@ def addToTextQueue(hero, string):
 def isPlaying(game):
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
+  
+def playSoundQueue(game):
+  if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
+    backgroundSound = game['config']['hud']['assets']['sound']
+    sound = game['sounds'][backgroundSound]
+    play(sound)
+    game['config']['sound_start_ts'] = time.time()
+  if game['hero']['soundQueue']:
+    sound = game['sounds'][game['hero']['soundQueue']]
+    play(sound)
