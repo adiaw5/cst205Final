@@ -304,6 +304,8 @@ def start():
     
     printNow("\n".join(hero['textQueue']))
     # <TODO> Add scene rendering here
+    renderScene(game)
+    
     # <TODO> Add music manager here.  
     # <TODO> THIS SHOULD GO IN THE SOUND MANAGER
     if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
@@ -653,6 +655,9 @@ def initialize():
   game['images'] = {}
   game['sounds'] = {}
   loadAssets(game, game)
+  game['scene'] = makeEmptyPicture(1122,1058)
+  loadAssets(game, game)
+  game['hud'] = copyImage(game['images']['hud.jpg'], game['scene'], 0, 858)
 
   # Setup the necessary variables to track the duration of
   # background sound.
@@ -712,3 +717,83 @@ def addToTextQueue(hero, string):
 def isPlaying(game):
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
+  
+  
+def copyImage(image,interface, targetX =0, targetY = 0):   
+  """
+  This function copies the different pictures to create the game interface. 
+  
+  Args:
+    image: This is the various image that constitute the interface
+    interface: This the empty picuture frame on which to copy the picture to
+    targetX: this is the x coordonate where to copy the picture to
+    targetY: This is the y coordonate where to copy the picture to
+  """
+  
+  # Get the width and Height 
+  targetW = getWidth(interface)
+  targetH = getHeight(interface)
+  sourceW = getWidth(image)
+  sourceH = getHeight(image)
+  
+  if(targetX > targetW or targetY > targetH):
+    return target
+  xMax = min(targetX + sourceW, targetW)
+  yMax = min(targetY + sourceH, targetH)
+  x = 0
+  for destX in range(targetX, xMax):
+    y = 0
+    for destY in range(targetY, yMax):
+      p = getPixel(image, x, y)
+      destPixel = getPixel(interface, destX, destY)
+      setColor(destPixel, getColor(p))
+      y += 1
+    x += 1
+  return interface
+  
+def renderScene(game):
+  """
+    This function renders the scene as the use moves through various 
+    parts of the house
+    Arg:
+      renderScene(game): This function take current instance of the 
+      game as an argument
+  """
+  #Get a house reference from game
+  house = game['house']
+  
+  #Gets a hero reference from game
+  hero = game['hero']
+  
+  #Gets here's item reference from game
+  items = game['items']
+  
+  #Gets hero's room location
+  heroRoom = house[hero['location']]
+  
+  #Gets the current hero room image
+  roomImage = heroRoom['assets']['image']
+  gameImages = game['images'][roomImage]
+  
+  #Make a call to copyImage function and copy the image to the scene   
+  copyImage(gameImages, game['scene'])
+  
+  #Display commands for the user on the hud 
+  addText(game['scene'],504, 888,(hero['textQueue'][0]))    
+  
+  #Gets the current hero inventory
+  inventory = hero['inventory']
+  
+  #Sets the intial X possition for Items on the hud
+  itemPosX = 37
+  
+  #Loops through the item list and copy the existing items to the hud
+  for item in inventory:
+    itemImage = items[item]['assets']['image']   
+    image =  game['images'][itemImage]
+    copyImage(image, game['scene'], itemPosX, 988)
+    itemPosX += getWidth(image)
+  
+  #Repaints the scene on the current hero location
+  repaint(game['scene'])
+    
