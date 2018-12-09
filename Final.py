@@ -252,13 +252,13 @@ itemsMaster = {
   },
   'painting' : {
     'actions' : {
-      'examine' : "A pantiing of the ballroom. You noticed in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
+      'examine' : "A pantiing of the ballroom. You noticed that in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
     },
-    'location' : 'A painting of the ballroom with the china cabinet closed.'
+    'location' : 'A painting of the ballroom whhich displays the china cabinet closed.'
   },
   'cabinet' : {
     'actions' : {
-      'examine' : "The china cabinet in the pantiing of the ballroom. The china cabinet is open. You should CLOSED the cabinet",
+      'examine' : "This is the china cabinet in the paintiing. This china cabinet is open. You should CLOSE the cabinet",
       'close' : "You have closed the china cabinet."
     },
     'location' : 'An open china cabinet.'
@@ -599,7 +599,7 @@ def use(house, items, hero, object = False):
     object (string): The object the action is to be performed on, if it exists.
   """
   heroRoom = house[hero['location']]
-  if object in hero['inventory']:
+  if object in hero['inventory'] or object in heroRoom['items']:
     if 'use' in items[object]['actions']:
       addToTextQueue(hero, items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
