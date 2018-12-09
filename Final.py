@@ -603,6 +603,9 @@ def use(house, items, hero, object = False):
       addToTextQueue(hero, items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
         heroRoom['events'].append('eventOpenExit')
+      elif object == 'stone' and hero['location'] == 'courtyard':
+        #player uses the magic stone reset move count
+        hero['moves'] = 50
     else:
       addToTextQueue(hero, "You cannot USE the %s!" % object)
   else:
