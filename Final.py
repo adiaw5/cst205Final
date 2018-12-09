@@ -69,8 +69,7 @@ wear. You try to get your bearings, you EXAMINE the room.
 
 houseMaster = {
   "bedroom" : {
-    'examine' : """=========== The Bedroom ===========
-A plain looking room with a messy bed, a night stand, a desk and a chair.
+    'examine' : """A plain looking room with a messy bed, a night stand, a desk and a chair.
 The light of the moon shines through the westside window.
 A door to leading to a NORTH hallway is wide open. There
 is also a door open in the EAST side leading to a courtyard.
@@ -86,8 +85,7 @@ is also a door open in the EAST side leading to a courtyard.
   },
 
   "courtyard" : {
-    'examine' : """=========== The Courtyard ===========
-An wide square courtyard full of flowers and a bench. The center of the
+    'examine' : """An wide square courtyard full of flowers and a bench. The center of the
 courtyard leads splits into different paths: WEST is the
 bedroom, EAST is the foyer
 """,
@@ -103,8 +101,7 @@ bedroom, EAST is the foyer
   },
 
   'hallway' : {
-    'examine' : """=========== The Hallway ===========
-The long, narrow hallway. The wall paper decoration is clearly dated
+    'examine' : """The long, narrow hallway. The wall paper decoration is clearly dated
 and the boards creek as you walk. The light of a room
 shines dimly at the NORTH end of the passageway. SOUTH is a
 bedroom you're familiar with but can't remember how.
@@ -121,8 +118,7 @@ bedroom you're familiar with but can't remember how.
   },
 
   'library' : {
-    'examine' : """=========== The Library ===========
-This library could belong to a university! The old smell of ink, paper,
+    'examine' : """This library could belong to a university! The old smell of ink, paper,
 and wine overwhelmes your senses. A sofa and a low table.
 The arch on the EAST side seem to open into a ballroom.
 """,
@@ -138,8 +134,7 @@ The arch on the EAST side seem to open into a ballroom.
   },
 
   'ballroom' : {
-    'examine': """=========== The Ballroom ===========
-The grand ballroom! It's already setup for the party, lined with tables,
+    'examine': """The grand ballroom! It's already setup for the party, lined with tables,
 decorations and soft music playing. You can see the wide
 doors to the library WEST and the foyer SOUTH.
 """,
@@ -154,8 +149,7 @@ doors to the library WEST and the foyer SOUTH.
   },
 
   'foyer' : {
-    'examine' : """=========== The Foyer ===========
-The entrance is a wide, long room with marble floors, and a large chandelier
+    'examine' : """The entrance is a wide, long room with marble floors, and a large chandelier
 lighting every corner. You can see the ballroom just
 NORTH and WEST the famous courtyard. The main door is
 locked by a skeleton key.
@@ -171,8 +165,7 @@ locked by a skeleton key.
     }
   },
   'laboratory' : {
-    'examine' : """=========== The Laboratory ===========
-A laboratory fool of beakers, and burners. It feels stuffy here!
+    'examine' : """A laboratory fool of beakers, and burners. \nIt feels stuffy here!
 The passageway SOUTH leads to the library.
 """,
     'move' : {
@@ -188,7 +181,7 @@ The passageway SOUTH leads to the library.
 itemsMaster = {
   'handle' : {
     'actions' : {
-      'examine' : "The HANDLE of a key... It looks like it's missing the NECK and TEETH",
+      'examine' : "The HANDLE of a key... It looks like \nit's missing the NECK and TEETH",
       'take' : "You gently place the HANDLE in your pocket.",
     },
     'location' : "You see a round loop like a HANDLE. Maybe you can TAKE it.",
@@ -198,7 +191,7 @@ itemsMaster = {
   },
   'neck' : {
     'actions' : {
-      'examine' : "The NECK of a key. A long and shiny bronze bar. Maybe you can TAKE it.",
+      'examine' : "The NECK of a key. A long and shiny \nbronze bar. Maybe you can TAKE it.",
       'take' : "You gently place the NECK in your pocket.",
     },
     'location' : "The NECK of a key seems to be resting at your reach.",
@@ -208,7 +201,7 @@ itemsMaster = {
   },
   'teeth' : {
     'actions' : {
-      'examine' : "The TEETH of a key. They seem to fit perfectly a skeleton lock.",
+      'examine' : "The TEETH of a key. They seem to fit \nperfectly a skeleton lock.",
       'take' : "You gently place the TEETH in your pocket.",
     },
     'location' : "You can see the TEETH of a key shinning.",
@@ -218,7 +211,7 @@ itemsMaster = {
   },
   'book' : {
     'actions' : {
-      'examine' : "A heavy, wornout book. The title reads: Experiments.",
+      'examine' : "A heavy, wornout book. The title reads: \nExperiments.",
       'take': "You take the book...",
       'put': "You gently place the book...",
     },
@@ -228,17 +221,17 @@ itemsMaster = {
     }
   },
   'coffee' : {
-    'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
+    'examine' : "A cup of coffee. Steam indicates the cup still \nwarm. It looks like you can DRINK it",
     'drink' : "You take a sip. What a delicious cup of coffee!",
     'location' : 'A still warm cup of COFFEE fills the room with a sweet scent.'
   },
   'bookshelf' : {
-    'examine' : "The bookshelf is full of books about science, biology and physics... There is a gap. Something can be PUT here.",
+    'examine' : "The bookshelf is full of books about science,\n biology and physics... There is a gap. Something \ncan be PUT here.",
     'location' : "A BOOKSHELF lines the north wall from floor to celing."
   },
   'key' : {
     'actions' : {
-      'examine' : "A shiny skeleton key. It would fit nicely in a door. But where can you USE it?",
+      'examine' : "A shiny skeleton key. It would fit nicely in a \ndoor. But where can you USE it?",
       'use' : "you USE the key and jiggle it."
     },
     'assets' : {
@@ -689,7 +682,6 @@ def downloadAsset(type, name):
   cwd = '' 
   try:
     cwd = tempfile.gettempdir()
-    raise Exception('Test test test')
   except:
     cwd = os.getcwd() + '/VASC9tmp'
     if not os.path.isdir(cwd):
@@ -698,7 +690,7 @@ def downloadAsset(type, name):
   url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
   
   testfile = urllib.URLopener()
-  printNow("Loading now: %s" % url + name)
+  printNow("Loading now: %s" % name)
   testfile.retrieve(url + name, cwd + name)
 
   if type == 'sounds':
@@ -707,7 +699,22 @@ def downloadAsset(type, name):
     return makePicture(cwd + name)
 
 def addToTextQueue(hero, string):
-  hero['textQueue'].append(string)
+  parts string.split('\n')
+  for part in parts:
+    hero['textQueue'].append(part)
+
+def printTextQueue(game):
+  # 50 Characters and 9 lines is what we're comfortable printing.
+  strings = hero['textQueue']
+  textImage = makePicture(577, 142, black)
+  scene = game['scene']
+  origX = game['config']['textPos'][0]
+  origY = game['config']['textPos'][1]
+  origY = getHeight(scene) - getHeight(game['images']['hud.jpg']) + origY
+  for string in strings:
+    addText(textImage, origX, origY, string, white)
+    origY += 15
+  return textImage
 
 def isPlaying(game):
   state = game['hero']['state']
