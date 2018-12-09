@@ -240,16 +240,23 @@ itemsMaster = {
     'location' : 'A colorful stone is in the courtyard.'
   },
   'lever' : {
-    'examine' : "A mysterious lever is in the room. This lever might open something. It looks like you can USE it",
-    'use' : "you USE the mysterious lever and open a window! Listen to the owls outside.",
+    'actions' : {
+      'examine' : "A mysterious lever is in the room. This lever might open something. It looks like you can USE it",
+      'use' : "you USE the mysterious lever and open a window! Listen to the owls outside."
+    },   
     'location' : 'A mysterious lever is in the room.'
   },
   'painting' : {
-    'examine' : "A pantiing of the ballroom. You noticed in the painting the china cabinet is closed. You should EXAMIINE the cabinet",
+    'actions' : {
+      'examine' : "A pantiing of the ballroom. You noticed in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
+      },
     'location' : 'A painting of the ballroom with the china cabinet closed.'
   },
   'cabinet' : {
-    'examine' : "The china cabinet in the pantiing of the ballroom. The china cabinet is open. You should CLOSED the cabinet",
+    'actions' : {
+      'examine' : "The china cabinet in the pantiing of the ballroom. The china cabinet is open. You should CLOSED the cabinet",
+      'close' : "You have closed the china cabinet."
+      },
     'location' : 'An open china cabinet.'
   },
   'bookshelf' : {
