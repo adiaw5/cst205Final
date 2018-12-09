@@ -274,7 +274,7 @@ def start():
 
   # Print all initial information for the user.
   game = initialize()
-  house = game['house']
+  house = game['house']  
   items = game['items']
   hero = game['hero']
 
@@ -377,7 +377,7 @@ def doAction(action, object, house, items, hero):
 
   # Action logic
   if action == 'move':
-    move(house, object, hero)
+    move(house, object, hero, items)
   elif action == 'examine':
     examine(house, items, hero, object)
   elif action == 'put':
@@ -418,7 +418,7 @@ def checkEvents(house, items, hero):
         eventOpenExit(house, items, hero)
   eventMakeKey(house, items, hero)
 
-def move(house, direction, hero):
+def move(house, direction, hero, items):
   """Moves the hero from a location to another in the house.
   The hero can only move if the direction is allowed.
   Args:
