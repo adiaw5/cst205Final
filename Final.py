@@ -78,7 +78,8 @@ is also a door open in the EAST side leading to a courtyard.
       'north' : 'hallway',
       'east'  : 'courtyard',
     },
-    'items' : ['handle'],
+    'items' : ['handle','lever'],
+    'events' : ['eventLibrary'],
     'assets': {
       'image' : 'bedroom.jpg'
     }
@@ -93,8 +94,8 @@ bedroom, EAST is the foyer
       'west' : 'bedroom',
       'east' : 'foyer'
     },
-    'items' : [],
-    'events' : [],
+    'items' : ['stone'],
+    'events' : ['eventLibrary'],
     'assets': {
       'image' : 'courtyard.jpg'
     }
@@ -142,7 +143,8 @@ doors to the library WEST and the foyer SOUTH.
       'west' : 'library',
       'south' : 'foyer'
     },
-    'items' : ['teeth'],
+    'items' : ['teeth','painting','cabinet'],
+    'events' : ['eventLibrary'],
     'assets': {
       'image' : 'ballroom.jpg'
     }
@@ -221,12 +223,42 @@ itemsMaster = {
     }
   },
   'coffee' : {
-    'examine' : "A cup of coffee. Steam indicates the cup still \nwarm. It looks like you can DRINK it",
-    'drink' : "You take a sip. What a delicious cup of coffee!",
+    'actions' : {
+      'examine' : "A cup of coffee. Steam indicates the cup still \nwarm. It looks like you can DRINK it",
+      'drink' : "You take a sip. What a delicious cup of coffee!"
+    },
     'location' : 'A still warm cup of COFFEE fills the room with a sweet scent.'
   },
+  'stone' : {
+    'actions' : {
+      'examine' : "A colorful stone. This colorful magic stone will reset you move count. It looks like you can USE it",
+      'use' : "you USE the colorful magic stone and reset your move count!"
+    },
+    'location' : 'A colorful stone is in the courtyard.'
+  },
+  'lever' : {
+    'actions' : {
+      'examine' : "A mysterious lever is in the room. This lever might open something. It looks like you can USE it",
+      'use' : "you USE the mysterious lever and open a window! Listen to the owls outside."
+    },   
+    'location' : 'A mysterious lever is in the room.'
+  },
+  'painting' : {
+    'actions' : {
+      'examine' : "A pantiing of the ballroom. You noticed that in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
+    },
+    'location' : 'A painting of the ballroom which displays the china cabinet closed.'
+  },
+  'cabinet' : {
+    'actions' : {
+      'examine' : "This is the china cabinet in the paintiing. This china cabinet is open. You should CLOSE the cabinet",
+      'close' : "You have closed the china cabinet."
+    }    
+  },
   'bookshelf' : {
-    'examine' : "The bookshelf is full of books about science,\n biology and physics... There is a gap. Something \ncan be PUT here.",
+    'actions' : {
+      'examine' : "The bookshelf is full of books about science, \nbiology and physics... There is a gap. Something \ncan be PUT here."
+    },
     'location' : "A BOOKSHELF lines the north wall from floor to celing."
   },
   'key' : {
@@ -248,7 +280,7 @@ heroMaster = {
   'textQueue' : []
 }
 
-configsMaster = {
+configMaster = {
   'hud' : {
     'assets' : {
       'image' : 'hud.jpg',
@@ -267,7 +299,7 @@ def start():
 
   # Print all initial information for the user.
   game = initialize()
-  house = game['house']
+  house = game['house']  
   items = game['items']
   hero = game['hero']
 
@@ -296,7 +328,8 @@ def start():
       playGame(game)
     
     printNow("\n".join(hero['textQueue']))
-    # <TODO> Add scene rendering here
+    renderScene(game)
+    
     # <TODO> Add music manager here.  
     # <TODO> THIS SHOULD GO IN THE SOUND MANAGER
     if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
@@ -370,7 +403,7 @@ def doAction(action, object, house, items, hero):
 
   # Action logic
   if action == 'move':
-    move(house, object, hero)
+    move(house, object, hero, items)
   elif action == 'examine':
     examine(house, items, hero, object)
   elif action == 'put':
@@ -411,7 +444,7 @@ def checkEvents(house, items, hero):
         eventOpenExit(house, items, hero)
   eventMakeKey(house, items, hero)
 
-def move(house, direction, hero):
+def move(house, direction, hero, items):
   """Moves the hero from a location to another in the house.
   The hero can only move if the direction is allowed.
   Args:
@@ -559,7 +592,7 @@ def use(house, items, hero, object = False):
     object (string): The object the action is to be performed on, if it exists.
   """
   heroRoom = house[hero['location']]
-  if object in hero['inventory']:
+  if object in hero['inventory'] or object in heroRoom['items']:
     if 'use' in items[object]['actions']:
       addToTextQueue(hero, items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
@@ -642,10 +675,20 @@ def initialize():
   game['house'] = copy.deepcopy(houseMaster)
   game['hero'] = copy.deepcopy(heroMaster)
   game['items'] = copy.deepcopy(itemsMaster)
-  game['config'] = copy.deepcopy(configsMaster)
+  game['config'] = copy.deepcopy(configMaster)
   game['images'] = {}
   game['sounds'] = {}
   loadAssets(game, game)
+  
+  loadAssets(game, game)
+
+  # Initialize the scene with dynamic sizes.
+  heroRoom = game['hero']['location']
+  heroImage = game['images'][heroRoom]
+  hudImage = game['images']['hud.jpg']
+  game['scene'] = makeEmptyPicture(getWidth(hudImage), getHeight(hudImage) + getHeight(heroImage))
+  hudHeight = getHeight(game['scene']) - getHeight(heroImage)
+  copyImage(game['images']['hud.jpg'], game['scene'], 0, hudHeight)
 
   # Setup the necessary variables to track the duration of
   # background sound.
@@ -699,18 +742,17 @@ def downloadAsset(type, name):
     return makePicture(cwd + name)
 
 def addToTextQueue(hero, string):
-  parts string.split('\n')
+  parts = string.split('\n')
   for part in parts:
     hero['textQueue'].append(part)
 
 def printTextQueue(game):
   # 50 Characters and 9 lines is what we're comfortable printing.
-  strings = hero['textQueue']
-  textImage = makePicture(577, 142, black)
+  strings = game['hero']['textQueue']
+  textImage = makeEmptyPicture(577, 142, black)
   scene = game['scene']
-  origX = game['config']['textPos'][0]
-  origY = game['config']['textPos'][1]
-  origY = getHeight(scene) - getHeight(game['images']['hud.jpg']) + origY
+  origX = 15
+  origY = 15
   for string in strings:
     addText(textImage, origX, origY, string, white)
     origY += 15
@@ -719,3 +761,87 @@ def printTextQueue(game):
 def isPlaying(game):
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
+  
+  
+def copyImage(image,interface, targetX =0, targetY = 0):   
+  """
+  This function copies the different pictures to create the game interface. 
+  
+  Args:
+    image: This is the various image that constitute the interface
+    interface: This the empty picuture frame on which to copy the picture to
+    targetX: this is the x coordonate where to copy the picture to
+    targetY: This is the y coordonate where to copy the picture to
+  """
+  
+  # Get the width and Height 
+  targetW = getWidth(interface)
+  targetH = getHeight(interface)
+  sourceW = getWidth(image)
+  sourceH = getHeight(image)
+  
+  if(targetX > targetW or targetY > targetH):
+    return target
+  xMax = min(targetX + sourceW, targetW)
+  yMax = min(targetY + sourceH, targetH)
+  x = 0
+  for destX in range(targetX, xMax):
+    y = 0
+    for destY in range(targetY, yMax):
+      p = getPixel(image, x, y)
+      destPixel = getPixel(interface, destX, destY)
+      setColor(destPixel, getColor(p))
+      y += 1
+    x += 1
+  return interface
+  
+def renderScene(game):
+  """
+    This function renders the scene as the use moves through various 
+    parts of the house
+    Arg:
+      renderScene(game): This function take current instance of the 
+      game as an argument
+  """
+  #Get a house reference from game
+  house = game['house']
+
+  #Gets a hero reference from game
+  hero = game['hero']
+
+  #Gets here's item reference from game
+  items = game['items']
+
+  #Gets hero's room location
+  heroRoom = house[hero['location']]
+
+  #Gets the current hero room image
+  roomImage = heroRoom['assets']['image']
+  gameImages = game['images'][roomImage]
+
+  #Make a call to copyImage function and copy the image to the scene   
+  copyImage(gameImages, game['scene'])
+
+  #Gets the current hero inventory
+  inventory = hero['inventory']
+
+  #Sets the intial X possition for Items on the hud
+  itemPosX = game['config']['hud']['iconPos'][0]
+  itemPosY = game['config']['hud']['iconPos'][1]
+
+  #Loops through the item list and copy the existing items to the hud
+  for item in inventory:
+    itemImage = items[item]['assets']['image']   
+    image =  game['images'][itemImage]
+    copyImage(image, game['scene'], itemPosX, itemPosY)
+    itemPosX += getWidth(image)
+
+  textImage = printTextQueue(game)
+  origX = game['config']['hud']['textPos'][0]
+  origY = game['config']['hud']['textPos'][1]
+  origY = getHeight(game['scene']) - getHeight(game['images']['hud.jpg']) + origY
+  copyImage(textImage, game['scene'], origX, origY)
+
+
+  #Repaints the scene on the current hero location
+  repaint(game['scene'])
