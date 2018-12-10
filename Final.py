@@ -312,10 +312,13 @@ configMaster = {
       'bedroom.jpg',
       'courtyard.jpg',
       'foyer.jpg',
+      'foyer_open.jpg',
       'hallway.jpg',
       'hud.jpg',
       'laboratory.jpg',
-      'library.jpg'
+      'library.jpg',
+      'library_open.JPG',
+      'empty_slot.jpg'
     ],
     'sounds' : [
       '109662__grunz__success.wav',
@@ -858,9 +861,11 @@ def renderScene(game):
     itemPosY = game['config']['hud']['iconPos'][1] + getHeight(heroImage)
 
     #Loops through the item list and copy the existing items to the hud
-    for item in inventory:
-      itemImage = items[item]['assets']['image']   
-      image =  game['images'][itemImage]
+    for i in range(0, 5):
+      image = game['images']['empty_slot.jpg']
+      if i in inventory:
+        itemImage = items[item]['assets']['image']
+        image =  game['images'][itemImage]
       copyImage(image, game['scene'], itemPosX, itemPosY)
       itemPosX += getWidth(image)
 
