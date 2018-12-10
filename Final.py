@@ -130,7 +130,8 @@ The arch on the EAST side seem to open into a ballroom.
     'items' : ['coffee', 'bookshelf'],
     'events' : ['eventLibrary'],
     'assets': {
-      'image' : 'library.jpg'
+      'image' : 'library.jpg',
+      'sound' : '76175__mattpavone__planetary-flyby-faster.aiff'
     }
   },
 
@@ -163,7 +164,8 @@ locked by a skeleton key.
     'items' : ['book'],
     'events' : [],
     'assets': {
-      'image' : 'foyer.jpg'
+      'image' : 'foyer.jpg',
+      'sound' : 'creaky_door_4.wav'
     }
   },
   'laboratory' : {
@@ -267,7 +269,8 @@ itemsMaster = {
       'use' : "you USE the key and jiggle it."
     },
     'assets' : {
-      'image' : 'Inv_misc_key_15.jpg'
+      'image' : 'Inv_misc_key_15.jpg',
+      'sound' : '109662__grunz__success.wav'
     }
   }
 }
@@ -277,7 +280,8 @@ heroMaster = {
   'inventory' : [],
   'moves' : 50,
   'name' : '',
-  'textQueue' : []
+  'textQueue' : [],
+  'soundQueue' : None
 }
 
 configMaster = {
@@ -317,28 +321,23 @@ def start():
         hero['name'] = name
         hero['state'] = 'intro'
       continue
-  
+
     elif hero['state'] == 'intro':
       showInformation(title + instructions)
       showInformation(introduction)
       examine(house, items, hero)
       hero['state'] = 'playing'
-      
+
     elif hero['state'] == 'playing':
       playGame(game)
-    
+
     printNow("\n".join(hero['textQueue']))
     renderScene(game)
-    
-    # <TODO> Add music manager here.  
-    # <TODO> THIS SHOULD GO IN THE SOUND MANAGER
-    if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
-      backgroundSound = game['config']['hud']['assets']['sound']
-      sound = game['sounds'][backgroundSound]
-      play(sound)
-      game['config']['sound_start_ts'] = time.time()
+    playSoundQueue(game)
 
-  # <TODO> Cleanup exit function. Should stop music
+  backgroundSound = game['config']['hud']['assets']['sound']
+  sound = game['sounds'][backgroundSound]
+  stopPlaying(sound)
   if  hero['state'] == "success":
     showInformation("%s! You have finally made out of the house! You have won the game, %s!" % (hero['name'], hero['name']))
   elif  hero['state'] == "quit":
@@ -364,7 +363,8 @@ def playGame(game):
     return
 
  # Empty the queue.
-  hero['textQueue'] = []    
+  hero['textQueue'] = []
+  hero['soundQueue'] = None  
   addToTextQueue(hero, "\n>>>You entered: "+user_response+"\n")
   args = user_response.split()
 
@@ -616,7 +616,7 @@ def eventLibrary(house, items, hero):
   if 'book' in house['library']['items']:
     # Remove the event so it cannot be triggered again.
     house['library']['events'].remove('eventLibrary')
-
+    hero['soundQueue'] = house['library']['assets']['sound']
     # Update the house data.
     house['library']['move']['north'] = "laboratory"
     house['library']['examine'] = """=========== The Library ===========
@@ -649,7 +649,7 @@ the famous courtyard.
 The SOUTH door is now unlocked.
 
 """
-
+  hero['soundQueue'] = house['foyer']['assets']['sound']
   showInformation("SOUTH, you hear the sound of a door unlocking.")
 
 def eventMakeKey(house, items, hero):
@@ -666,6 +666,7 @@ def eventMakeKey(house, items, hero):
     inventory.remove('neck')
     inventory.remove('teeth')
     inventory.append('key')
+    hero['soundQueue'] = itemsMaster['key']['assets']['sound']
 
     showInformation("You take all three pieces, and make a KEY out of them... You think you know where to USE it") 
 
@@ -682,17 +683,14 @@ def initialize():
   game['images'] = {}
   game['sounds'] = {}
   loadAssets(game, game)
-  
-  loadAssets(game, game)
 
   # Initialize the scene with dynamic sizes.
   heroLoc = game['hero']['location']
-  heroRoom = game['house'][heroLoc]
+  heroRoom = game['house'][heroLoc]['assets']['image']
   heroImage = game['images'][heroRoom]
   hudImage = game['images']['hud.jpg']
- 
   game['scene'] = makeEmptyPicture(getWidth(hudImage), getHeight(hudImage) + getHeight(heroImage))
-  hudHeight = getHeight(game['scene']) - getHeight(heroImage)
+  hudHeight = getHeight(game['scene'])
   copyImage(game['images']['hud.jpg'], game['scene'], 0, hudHeight)
 
   # Setup the necessary variables to track the duration of
@@ -735,9 +733,8 @@ def downloadAsset(type, name):
     if not os.path.isdir(cwd):
       os.mkdir(cwd)
       printNow("Saving files to the local directory: %s" % cwd)
-  #url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
-  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/vramirez/assets/%s/" % type
-
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
+  
   testfile = urllib.URLopener()
   printNow("Loading now: %s" % name)
   testfile.retrieve(url + name, cwd + name)
@@ -767,8 +764,7 @@ def printTextQueue(game):
 def isPlaying(game):
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
-  
-  
+
 def copyImage(image,interface, targetX =0, targetY = 0):   
   """
   This function copies the different pictures to create the game interface. 
@@ -800,7 +796,7 @@ def copyImage(image,interface, targetX =0, targetY = 0):
       y += 1
     x += 1
   return interface
-  
+
 def renderScene(game):
   """
     This function renders the scene as the use moves through various 
@@ -848,6 +844,16 @@ def renderScene(game):
   origY = getHeight(game['scene']) - getHeight(game['images']['hud.jpg']) + origY
   copyImage(textImage, game['scene'], origX, origY)
 
-
   #Repaints the scene on the current hero location
   repaint(game['scene'])
+
+def playSoundQueue(game):
+  if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
+    backgroundSound = game['config']['hud']['assets']['sound']
+    sound = game['sounds'][backgroundSound]
+    play(sound)
+    game['config']['sound_start_ts'] = time.time()
+
+  if game['hero']['soundQueue']:
+    sound = game['sounds'][game['hero']['soundQueue']]
+    play(sound)
