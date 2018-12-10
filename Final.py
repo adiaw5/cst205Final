@@ -233,28 +233,28 @@ itemsMaster = {
   },
   'stone' : {
     'actions' : {
-      'examine' : "A colorful stone. This colorful magic stone will reset you move count. It looks like you can USE it",
-      'use' : "you USE the colorful magic stone and reset your move count!"
+      'examine' : "This colorful magic STONE will reset you move count.\nIt looks like you can USE it",
+      'use' : "you USE the colorful magic STONE and reset your move count!"
     },
-    'location' : 'A colorful stone is in the courtyard.'
+    'location' : 'A colorful STONE is in the courtyard.'
   },
   'lever' : {
     'actions' : {
-      'examine' : "A mysterious lever is in the room. This lever might open something. It looks like you can USE it",
-      'use' : "you USE the mysterious lever and open a window! Listen to the owls outside."
+      'examine' : "This mysterious LEVER should open something.\nIt looks like you can USE it",
+      'use' : "you USE the mysterious LEVER and open a window! Listen to the owls outside."
     },   
-    'location' : 'A mysterious lever is in the room.'
+    'location' : 'A mysterious LEVER is in the room.'
   },
   'painting' : {
     'actions' : {
-      'examine' : "A pantiing of the ballroom. You noticed that in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
+      'examine' : "You noticed that in the PAINTING the china CABINET\n is closed. EXAMIINE the CABINET"
     },
-    'location' : 'A painting of the ballroom which displays the china cabinet closed.'
+    'location' : 'A PAINTING of the ballroom which displays the china CABINET closed.'
   },
   'cabinet' : {
     'actions' : {
-      'examine' : "This is the china cabinet in the paintiing. This china cabinet is open. You should CLOSE the cabinet",
-      'close' : "You have closed the china cabinet."
+      'examine' : "This is the china CABINET in the paintiing, which is open.\nYou should CLOSE the cabinet",
+      'close' : "You have closed the china CABINET."
     }    
   },
   'bookshelf' : {
@@ -641,7 +641,7 @@ def use(house, items, hero, object = False):
         #player uses the magic stone reset move count
         heroRoom['items'].remove(object)
         hero['moves'] = 50
-        addToTextQueue(hero, "%s, you have 50 moves again!" % her['name'])
+        addToTextQueue(hero, "%s, you have 50 moves again!" % hero['name'])
     else:
       addToTextQueue(hero, "You cannot USE the %s!" % object)
   else:
