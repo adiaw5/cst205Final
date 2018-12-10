@@ -281,7 +281,11 @@ heroMaster = {
   'moves' : 50,
   'name' : '',
   'textQueue' : [],
-  'soundQueue' : None
+  'soundQueue' : None,
+  'flags' : {
+    'hud' : True,
+    'map' : True
+  }
 }
 
 configMaster = {
@@ -292,6 +296,37 @@ configMaster = {
     },
     'iconPos' : [37, 100],
     'textPos' : [504, 30],
+  },
+  'assets' : {
+    'images' : [
+      'Inv_misc_book_11.jpg',
+      'Inv_misc_key_01.jpg',
+      'Inv_misc_key_02.jpg',
+      'Inv_misc_key_03.jpg',
+      'Inv_misc_key_04.jpg',
+      'Inv_misc_key_05.jpg',
+      'Inv_misc_key_07.jpg',
+      'Inv_misc_key_13.jpg',
+      'Inv_misc_key_15.jpg',
+      'ballroom.jpg',
+      'bedroom.jpg',
+      'courtyard.jpg',
+      'foyer.jpg',
+      'hallway.jpg',
+      'hud.jpg',
+      'laboratory.jpg',
+      'library.jpg'
+    ],
+    'sounds' : [
+      '109662__grunz__success.wav',
+      '325112__fisch12345__success.wav',
+      '335751__j1987__put-item.wav',
+      '359134__theminkman__metal-moving.wav',
+      '410983__mihirfreesound__unlocking-door.wav',
+      'creaky_door_4.wav',
+      '76175__mattpavone__planetary-flyby-faster.aiff',
+      'bensound-ofeliasdream.wav',
+    ]
   }
 }
 
@@ -344,7 +379,6 @@ def start():
     showInformation("Thank you for playing, %s. Please come again!" % hero['name'])
   else:
     showInformation("Sorry %s! You have run out of moves, please try again!" % hero['name'])
-
 
 def playGame(game):
   hero = game['hero']
@@ -465,6 +499,7 @@ def move(house, direction, hero, items):
     newRoom = validDirections[direction]
     hero['location'] = newRoom
     examine(house, items, hero)
+    hero['flags']['map'] = True
   else:
     #Invalid direction entered
     if direction:
@@ -559,6 +594,7 @@ def take(house, items, hero, object):
       hero['inventory'].append(object)
       heroRoom['items'].remove(object)
       addToTextQueue(hero, items[object]['actions']['take'])
+      hero['flags']['hud'] = True
     else:
       addToTextQueue(hero, "You cannot take the %s from this room" % object)
   else:
@@ -578,6 +614,7 @@ def put(house, items, hero, object):
       heroRoom['items'].append(object)
       hero['inventory'].remove(object)
       addToTextQueue(hero, items[object]['actions']['put'])
+      hero['flags']['hud'] = True
     else:
       addToTextQueue(hero, "You cannot PUT the %s!" % object)
   else:
@@ -599,7 +636,9 @@ def use(house, items, hero, object = False):
         heroRoom['events'].append('eventOpenExit')
       elif object == 'stone' and hero['location'] == 'courtyard':
         #player uses the magic stone reset move count
+        heroRoom['items'].remove(object)
         hero['moves'] = 50
+        addToTextQueue(hero, "%s, you have 50 moves again!" % her['name'])
     else:
       addToTextQueue(hero, "You cannot USE the %s!" % object)
   else:
@@ -619,7 +658,7 @@ def eventLibrary(house, items, hero):
     hero['soundQueue'] = house['library']['assets']['sound']
     # Update the house data.
     house['library']['move']['north'] = "laboratory"
-    house['library']['examine'] = """=========== The Library ===========
+    house['library']['examine'] = """
 This library could belong to a university! The old smell of ink, paper,
 and wine overwhelmes your senses. A sofa and a low table
 complete the room making it pleasant and warm.
@@ -641,7 +680,7 @@ def eventOpenExit(house, items, hero):
   """
   house['foyer']['events'].remove('eventOpenExit')
   house['foyer']['move']['south'] = "exit"
-  house['foyer']['examine'] = """=========== The Foyer ===========
+  house['foyer']['examine'] = """
 The entrance is a wide, long room with marble floors, and a large chandelier
 lighting every corner. You can see the ballroom just NORTH and WEST
 the famous courtyard.
@@ -667,6 +706,7 @@ def eventMakeKey(house, items, hero):
     inventory.remove('teeth')
     inventory.append('key')
     hero['soundQueue'] = itemsMaster['key']['assets']['sound']
+    hero['flags']['hud'] = True
 
     showInformation("You take all three pieces, and make a KEY out of them... You think you know where to USE it") 
 
@@ -682,7 +722,7 @@ def initialize():
   game['config'] = copy.deepcopy(configMaster)
   game['images'] = {}
   game['sounds'] = {}
-  loadAssets(game, game)
+  loadAssets(game)
 
   # Initialize the scene with dynamic sizes.
   heroLoc = game['hero']['location']
@@ -690,7 +730,7 @@ def initialize():
   heroImage = game['images'][heroRoom]
   hudImage = game['images']['hud.jpg']
   game['scene'] = makeEmptyPicture(getWidth(hudImage), getHeight(hudImage) + getHeight(heroImage))
-  hudHeight = getHeight(game['scene'])
+  hudHeight = getHeight(heroImage)
   copyImage(game['images']['hud.jpg'], game['scene'], 0, hudHeight)
 
   # Setup the necessary variables to track the duration of
@@ -701,24 +741,16 @@ def initialize():
 
   return game
 
-def loadAssets(dic, game):
-  for key, value in dic.items():
-    if type(value) is dict:
-      if 'assets' in value:
-        loadAsset(value, game)
-      else:
-        loadAssets(value, game)
+def loadAssets(game):
+  allAssets = game['config']['assets']
+  for type, assets in allAssets.items():
+    for asset in assets:
+      loadAsset(asset, type, game)
 
-def loadAsset(assetDic, game):
-  if 'image' in assetDic['assets']:
-    name = assetDic['assets']['image']
-    if not name in game['images']:
-      game['images'][name] = downloadAsset('images', name)
-  if 'sound' in assetDic['assets']:
-    name = assetDic['assets']['sound']
-    if not name in game['sounds']:
-      game['sounds'][name] = downloadAsset('sounds', name)
-
+def loadAsset(name, type, game):
+  if not name in game[type]:
+    game[type][name] = downloadAsset(type, name)
+  
 def downloadAsset(type, name):
   """ Load assets from the remote repo.
   Args:
@@ -805,38 +837,30 @@ def renderScene(game):
       renderScene(game): This function take current instance of the 
       game as an argument
   """
-  #Get a house reference from game
+  #Get the game references
   house = game['house']
-
-  #Gets a hero reference from game
   hero = game['hero']
-
-  #Gets here's item reference from game
   items = game['items']
-
-  #Gets hero's room location
   heroRoom = house[hero['location']]
 
-  #Gets the current hero room image
-  roomImage = heroRoom['assets']['image']
-  gameImages = game['images'][roomImage]
+  if hero['flags']['map']:
+    #Gets the current hero room image
+    roomImage = heroRoom['assets']['image']
+    gameImages = game['images'][roomImage]
+    copyImage(gameImages, game['scene'])
 
-  #Make a call to copyImage function and copy the image to the scene   
-  copyImage(gameImages, game['scene'])
+  if hero['flags']['hud']:
+    #Gets the current hero inventory
+    inventory = hero['inventory']
+    itemPosX = game['config']['hud']['iconPos'][0]
+    itemPosY = game['config']['hud']['iconPos'][1]
 
-  #Gets the current hero inventory
-  inventory = hero['inventory']
-
-  #Sets the intial X possition for Items on the hud
-  itemPosX = game['config']['hud']['iconPos'][0]
-  itemPosY = game['config']['hud']['iconPos'][1]
-
-  #Loops through the item list and copy the existing items to the hud
-  for item in inventory:
-    itemImage = items[item]['assets']['image']   
-    image =  game['images'][itemImage]
-    copyImage(image, game['scene'], itemPosX, itemPosY)
-    itemPosX += getWidth(image)
+    #Loops through the item list and copy the existing items to the hud
+    for item in inventory:
+      itemImage = items[item]['assets']['image']   
+      image =  game['images'][itemImage]
+      copyImage(image, game['scene'], itemPosX, itemPosY)
+      itemPosX += getWidth(image)
 
   textImage = printTextQueue(game)
   origX = game['config']['hud']['textPos'][0]
@@ -845,6 +869,8 @@ def renderScene(game):
   copyImage(textImage, game['scene'], origX, origY)
 
   #Repaints the scene on the current hero location
+  hero['flags']['hud'] = False
+  hero['flags']['map'] = False
   repaint(game['scene'])
 
 def playSoundQueue(game):
