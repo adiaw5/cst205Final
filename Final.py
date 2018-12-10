@@ -69,8 +69,7 @@ wear. You try to get your bearings, you EXAMINE the room.
 
 houseMaster = {
   "bedroom" : {
-    'examine' : """=========== The Bedroom ===========
-A plain looking room with a messy bed, a night stand, a desk and a chair.
+    'examine' : """A plain looking room with a messy bed, a night stand, a desk and a chair.
 The light of the moon shines through the westside window.
 A door to leading to a NORTH hallway is wide open. There
 is also a door open in the EAST side leading to a courtyard.
@@ -87,8 +86,7 @@ is also a door open in the EAST side leading to a courtyard.
   },
 
   "courtyard" : {
-    'examine' : """=========== The Courtyard ===========
-An wide square courtyard full of flowers and a bench. The center of the
+    'examine' : """An wide square courtyard full of flowers and a bench. The center of the
 courtyard leads splits into different paths: WEST is the
 bedroom, EAST is the foyer
 """,
@@ -104,8 +102,7 @@ bedroom, EAST is the foyer
   },
 
   'hallway' : {
-    'examine' : """=========== The Hallway ===========
-The long, narrow hallway. The wall paper decoration is clearly dated
+    'examine' : """The long, narrow hallway. The wall paper decoration is clearly dated
 and the boards creek as you walk. The light of a room
 shines dimly at the NORTH end of the passageway. SOUTH is a
 bedroom you're familiar with but can't remember how.
@@ -122,8 +119,7 @@ bedroom you're familiar with but can't remember how.
   },
 
   'library' : {
-    'examine' : """=========== The Library ===========
-This library could belong to a university! The old smell of ink, paper,
+    'examine' : """This library could belong to a university! The old smell of ink, paper,
 and wine overwhelmes your senses. A sofa and a low table.
 The arch on the EAST side seem to open into a ballroom.
 """,
@@ -139,8 +135,7 @@ The arch on the EAST side seem to open into a ballroom.
   },
 
   'ballroom' : {
-    'examine': """=========== The Ballroom ===========
-The grand ballroom! It's already setup for the party, lined with tables,
+    'examine': """The grand ballroom! It's already setup for the party, lined with tables,
 decorations and soft music playing. You can see the wide
 doors to the library WEST and the foyer SOUTH.
 """,
@@ -156,8 +151,7 @@ doors to the library WEST and the foyer SOUTH.
   },
 
   'foyer' : {
-    'examine' : """=========== The Foyer ===========
-The entrance is a wide, long room with marble floors, and a large chandelier
+    'examine' : """The entrance is a wide, long room with marble floors, and a large chandelier
 lighting every corner. You can see the ballroom just
 NORTH and WEST the famous courtyard. The main door is
 locked by a skeleton key.
@@ -173,8 +167,7 @@ locked by a skeleton key.
     }
   },
   'laboratory' : {
-    'examine' : """=========== The Laboratory ===========
-A laboratory fool of beakers, and burners. It feels stuffy here!
+    'examine' : """A laboratory fool of beakers, and burners. \nIt feels stuffy here!
 The passageway SOUTH leads to the library.
 """,
     'move' : {
@@ -190,7 +183,7 @@ The passageway SOUTH leads to the library.
 itemsMaster = {
   'handle' : {
     'actions' : {
-      'examine' : "The HANDLE of a key... It looks like it's missing the NECK and TEETH",
+      'examine' : "The HANDLE of a key... It looks like \nit's missing the NECK and TEETH",
       'take' : "You gently place the HANDLE in your pocket.",
     },
     'location' : "You see a round loop like a HANDLE. Maybe you can TAKE it.",
@@ -200,7 +193,7 @@ itemsMaster = {
   },
   'neck' : {
     'actions' : {
-      'examine' : "The NECK of a key. A long and shiny bronze bar. Maybe you can TAKE it.",
+      'examine' : "The NECK of a key. A long and shiny \nbronze bar. Maybe you can TAKE it.",
       'take' : "You gently place the NECK in your pocket.",
     },
     'location' : "The NECK of a key seems to be resting at your reach.",
@@ -210,7 +203,7 @@ itemsMaster = {
   },
   'teeth' : {
     'actions' : {
-      'examine' : "The TEETH of a key. They seem to fit perfectly a skeleton lock.",
+      'examine' : "The TEETH of a key. They seem to fit \nperfectly a skeleton lock.",
       'take' : "You gently place the TEETH in your pocket.",
     },
     'location' : "You can see the TEETH of a key shinning.",
@@ -220,7 +213,7 @@ itemsMaster = {
   },
   'book' : {
     'actions' : {
-      'examine' : "A heavy, wornout book. The title reads: Experiments.",
+      'examine' : "A heavy, wornout book. The title reads: \nExperiments.",
       'take': "You take the book...",
       'put': "You gently place the book...",
     },
@@ -231,7 +224,7 @@ itemsMaster = {
   },
   'coffee' : {
     'actions' : {
-      'examine' : "A cup of coffee. Steam indicates the cup still warm. It looks like you can DRINK it",
+      'examine' : "A cup of coffee. Steam indicates the cup still \nwarm. It looks like you can DRINK it",
       'drink' : "You take a sip. What a delicious cup of coffee!"
     },
     'location' : 'A still warm cup of COFFEE fills the room with a sweet scent.'
@@ -254,24 +247,23 @@ itemsMaster = {
     'actions' : {
       'examine' : "A pantiing of the ballroom. You noticed that in the painting the china cabinet is closed. You should EXAMIINE the cabinet"
     },
-    'location' : 'A painting of the ballroom whhich displays the china cabinet closed.'
+    'location' : 'A painting of the ballroom which displays the china cabinet closed.'
   },
   'cabinet' : {
     'actions' : {
       'examine' : "This is the china cabinet in the paintiing. This china cabinet is open. You should CLOSE the cabinet",
       'close' : "You have closed the china cabinet."
-    },
-    'location' : 'An open china cabinet.'
+    }    
   },
   'bookshelf' : {
     'actions' : {
-      'examine' : "The bookshelf is full of books about science, biology and physics... There is a gap. Something can be PUT here."
+      'examine' : "The bookshelf is full of books about science, \nbiology and physics... There is a gap. Something \ncan be PUT here."
     },
     'location' : "A BOOKSHELF lines the north wall from floor to celing."
   },
   'key' : {
     'actions' : {
-      'examine' : "A shiny skeleton key. It would fit nicely in a door. But where can you USE it?",
+      'examine' : "A shiny skeleton key. It would fit nicely in a \ndoor. But where can you USE it?",
       'use' : "you USE the key and jiggle it."
     },
     'assets' : {
@@ -288,7 +280,7 @@ heroMaster = {
   'textQueue' : []
 }
 
-configsMaster = {
+configMaster = {
   'hud' : {
     'assets' : {
       'image' : 'hud.jpg',
@@ -336,7 +328,8 @@ def start():
       playGame(game)
     
     printNow("\n".join(hero['textQueue']))
-    # <TODO> Add scene rendering here
+    renderScene(game)
+    
     # <TODO> Add music manager here.  
     # <TODO> THIS SHOULD GO IN THE SOUND MANAGER
     if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
@@ -604,6 +597,9 @@ def use(house, items, hero, object = False):
       addToTextQueue(hero, items[object]['actions']['use'])
       if object == 'key' and hero['location'] == 'foyer':
         heroRoom['events'].append('eventOpenExit')
+      elif object == 'stone' and hero['location'] == 'courtyard':
+        #player uses the magic stone reset move count
+        hero['moves'] = 50
     else:
       addToTextQueue(hero, "You cannot USE the %s!" % object)
   else:
@@ -682,10 +678,22 @@ def initialize():
   game['house'] = copy.deepcopy(houseMaster)
   game['hero'] = copy.deepcopy(heroMaster)
   game['items'] = copy.deepcopy(itemsMaster)
-  game['config'] = copy.deepcopy(configsMaster)
+  game['config'] = copy.deepcopy(configMaster)
   game['images'] = {}
   game['sounds'] = {}
   loadAssets(game, game)
+  
+  loadAssets(game, game)
+
+  # Initialize the scene with dynamic sizes.
+  heroLoc = game['hero']['location']
+  heroRoom = game['house'][heroLoc]
+  heroImage = game['images'][heroRoom]
+  hudImage = game['images']['hud.jpg']
+ 
+  game['scene'] = makeEmptyPicture(getWidth(hudImage), getHeight(hudImage) + getHeight(heroImage))
+  hudHeight = getHeight(game['scene']) - getHeight(heroImage)
+  copyImage(game['images']['hud.jpg'], game['scene'], 0, hudHeight)
 
   # Setup the necessary variables to track the duration of
   # background sound.
@@ -722,16 +730,16 @@ def downloadAsset(type, name):
   cwd = '' 
   try:
     cwd = tempfile.gettempdir()
-    raise Exception('Test test test')
   except:
     cwd = os.getcwd() + '/VASC9tmp'
     if not os.path.isdir(cwd):
       os.mkdir(cwd)
       printNow("Saving files to the local directory: %s" % cwd)
-  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
-  
+  #url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/vramirez/assets/%s/" % type
+
   testfile = urllib.URLopener()
-  printNow("Loading now: %s" % url + name)
+  printNow("Loading now: %s" % name)
   testfile.retrieve(url + name, cwd + name)
 
   if type == 'sounds':
@@ -740,8 +748,106 @@ def downloadAsset(type, name):
     return makePicture(cwd + name)
 
 def addToTextQueue(hero, string):
-  hero['textQueue'].append(string)
+  parts = string.split('\n')
+  for part in parts:
+    hero['textQueue'].append(part)
+
+def printTextQueue(game):
+  # 50 Characters and 9 lines is what we're comfortable printing.
+  strings = game['hero']['textQueue']
+  textImage = makeEmptyPicture(577, 142, black)
+  scene = game['scene']
+  origX = 15
+  origY = 15
+  for string in strings:
+    addText(textImage, origX, origY, string, white)
+    origY += 15
+  return textImage
 
 def isPlaying(game):
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
+  
+  
+def copyImage(image,interface, targetX =0, targetY = 0):   
+  """
+  This function copies the different pictures to create the game interface. 
+  
+  Args:
+    image: This is the various image that constitute the interface
+    interface: This the empty picuture frame on which to copy the picture to
+    targetX: this is the x coordonate where to copy the picture to
+    targetY: This is the y coordonate where to copy the picture to
+  """
+  
+  # Get the width and Height 
+  targetW = getWidth(interface)
+  targetH = getHeight(interface)
+  sourceW = getWidth(image)
+  sourceH = getHeight(image)
+  
+  if(targetX > targetW or targetY > targetH):
+    return target
+  xMax = min(targetX + sourceW, targetW)
+  yMax = min(targetY + sourceH, targetH)
+  x = 0
+  for destX in range(targetX, xMax):
+    y = 0
+    for destY in range(targetY, yMax):
+      p = getPixel(image, x, y)
+      destPixel = getPixel(interface, destX, destY)
+      setColor(destPixel, getColor(p))
+      y += 1
+    x += 1
+  return interface
+  
+def renderScene(game):
+  """
+    This function renders the scene as the use moves through various 
+    parts of the house
+    Arg:
+      renderScene(game): This function take current instance of the 
+      game as an argument
+  """
+  #Get a house reference from game
+  house = game['house']
+
+  #Gets a hero reference from game
+  hero = game['hero']
+
+  #Gets here's item reference from game
+  items = game['items']
+
+  #Gets hero's room location
+  heroRoom = house[hero['location']]
+
+  #Gets the current hero room image
+  roomImage = heroRoom['assets']['image']
+  gameImages = game['images'][roomImage]
+
+  #Make a call to copyImage function and copy the image to the scene   
+  copyImage(gameImages, game['scene'])
+
+  #Gets the current hero inventory
+  inventory = hero['inventory']
+
+  #Sets the intial X possition for Items on the hud
+  itemPosX = game['config']['hud']['iconPos'][0]
+  itemPosY = game['config']['hud']['iconPos'][1]
+
+  #Loops through the item list and copy the existing items to the hud
+  for item in inventory:
+    itemImage = items[item]['assets']['image']   
+    image =  game['images'][itemImage]
+    copyImage(image, game['scene'], itemPosX, itemPosY)
+    itemPosX += getWidth(image)
+
+  textImage = printTextQueue(game)
+  origX = game['config']['hud']['textPos'][0]
+  origY = game['config']['hud']['textPos'][1]
+  origY = getHeight(game['scene']) - getHeight(game['images']['hud.jpg']) + origY
+  copyImage(textImage, game['scene'], origX, origY)
+
+
+  #Repaints the scene on the current hero location
+  repaint(game['scene'])
