@@ -766,6 +766,7 @@ def downloadAsset(type, name):
       os.mkdir(cwd)
       printNow("Saving files to the local directory: %s" % cwd)
   url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/assets2/assets/%s/" % type
   
   testfile = urllib.URLopener()
   printNow("Loading now: %s" % name)
