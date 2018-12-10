@@ -34,6 +34,7 @@
 # |_____________|____________|______________|
 
 import copy
+import java.awt.Font as Font
 import os
 import tempfile
 import time
@@ -177,7 +178,7 @@ The passageway SOUTH leads to the library.
     },
     'items' : ['neck'],
     'assets': {
-      'image' : 'bedroom.jpg'
+      'image' : 'laboratory.jpg'
     }
   }
 }
@@ -294,7 +295,7 @@ configMaster = {
       'image' : 'hud.jpg',
       'sound' : 'bensound-ofeliasdream.wav'
     },
-    'iconPos' : [173, 18],
+    'iconPos' : [173, 447],
     'textPos' : [26, 87],
   },
   'assets' : {
@@ -401,8 +402,8 @@ def playGame(game):
 
  # Empty the queue.
   hero['textQueue'] = []
-  hero['soundQueue'] = None  
-  addToTextQueue(hero, "\n>>>You entered: "+user_response+"\n")
+  hero['soundQueue'] = None
+  printNow(hero, "\n>>>You entered: "+user_response+"\n")
   args = user_response.split()
 
   # Game logic.
@@ -661,14 +662,15 @@ def eventLibrary(house, items, hero):
     hero['soundQueue'] = house['library']['assets']['sound']
     # Update the house data.
     house['library']['move']['north'] = "laboratory"
-    house['library']['examine'] = """
-This library could belong to a university! The old smell of ink, paper,
+    house['library']['assets']['image'] = "library_open.JPG"
+    house['library']['examine'] = """This library could belong to a university! The old smell of ink, paper,
 and wine overwhelmes your senses. A sofa and a low table
 complete the room making it pleasant and warm.
 The arch on the EAST side seem to open into a ballroom, and NORTH
 the omnious precense of the laboratory.
 """
     items['bookshelf']['location'] = "The BOOKSHELF has moved, revealing the secret room."
+    hero['flags']['map'] = True
 
     # Print the event.
     showInformation("\nThe Bookshelf shakes and trembles... Slowly, it moves revealing a passage NORTH.")
@@ -683,6 +685,7 @@ def eventOpenExit(house, items, hero):
   """
   house['foyer']['events'].remove('eventOpenExit')
   house['foyer']['move']['south'] = "exit"
+  house['foyer']['assets']['image'] = "foyer_open.jpg"
   house['foyer']['examine'] = """
 The entrance is a wide, long room with marble floors, and a large chandelier
 lighting every corner. You can see the ballroom just NORTH and WEST
@@ -692,6 +695,7 @@ The SOUTH door is now unlocked.
 
 """
   hero['soundQueue'] = house['foyer']['assets']['sound']
+  hero['flags']['map'] = True
   showInformation("SOUTH, you hear the sound of a door unlocking.")
 
 def eventMakeKey(house, items, hero):
@@ -796,6 +800,13 @@ def printTextQueue(game):
     origY += 15
   return textImage
 
+def printMoves(game):
+  textImage = makeEmptyPicture(163, 62, black)
+  myFont = makeStyle("Helvetica", Font.BOLD, 12)
+  text = "%s (%s/%s)" % (game['hero']['name'], game['hero']['moves'], 50)
+  addTextWithStyle(textImage, 15, 40, text, myFont, white)
+  return textImage
+
 def isPlaying(game):
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
@@ -810,7 +821,6 @@ def copyImage(image,interface, targetX =0, targetY = 0):
     targetX: this is the x coordonate where to copy the picture to
     targetY: This is the y coordonate where to copy the picture to
   """
-  
   # Get the width and Height 
   targetW = getWidth(interface)
   targetH = getHeight(interface)
@@ -853,17 +863,21 @@ def renderScene(game):
     roomImage = heroRoom['assets']['image']
     gameImages = game['images'][roomImage]
     copyImage(gameImages, game['scene'])
+    
+    statusImage = printMoves(game)
+    copyImage(statusImage, game['scene'], 0, getHeight(gameImages))
 
   if hero['flags']['hud']:
     #Gets the current hero inventory
     inventory = hero['inventory']
-    itemPosX = game['config']['hud']['iconPos'][0] + getWidth(heroImage)
-    itemPosY = game['config']['hud']['iconPos'][1] + getHeight(heroImage)
+    itemPosX = game['config']['hud']['iconPos'][0]
+    itemPosY = game['config']['hud']['iconPos'][1]
 
     #Loops through the item list and copy the existing items to the hud
-    for i in range(0, 5):
+    for i in range(0, 6):
       image = game['images']['empty_slot.jpg']
-      if i in inventory:
+      if i < len(inventory):
+        item = inventory[i]
         itemImage = items[item]['assets']['image']
         image =  game['images'][itemImage]
       copyImage(image, game['scene'], itemPosX, itemPosY)
@@ -871,7 +885,7 @@ def renderScene(game):
 
   textImage = printTextQueue(game)
   x = (getWidth(game['scene']) - getWidth(textImage)) / 2
-  y = getHeight(game['scene']) - getHeight(textImage) - 35
+  y = getHeight(game['scene']) - getHeight(textImage) - 38
   copyImage(textImage, game['scene'], x, y)
 
   #Repaints the scene on the current hero location
