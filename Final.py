@@ -80,7 +80,7 @@ is also a door open in the EAST side leading to a courtyard.
       'east'  : 'courtyard',
     },
     'items' : ['handle','lever'],
-    'events' : ['eventLibrary'],
+    'events' : [],
     'assets': {
       'image' : 'bedroom.jpg'
     }
@@ -96,7 +96,7 @@ bedroom, EAST is the foyer
       'east' : 'foyer'
     },
     'items' : ['stone'],
-    'events' : ['eventLibrary'],
+    'events' : [],
     'assets': {
       'image' : 'courtyard.jpg'
     }
@@ -146,7 +146,7 @@ doors to the library WEST and the foyer SOUTH.
       'south' : 'foyer'
     },
     'items' : ['teeth','painting','cabinet'],
-    'events' : ['eventLibrary'],
+    'events' : [],
     'assets': {
       'image' : 'ballroom.jpg'
     }
@@ -394,7 +394,7 @@ def playGame(game):
   if user_response == None:
     addToTextQueue(hero, "Please enter an action or QUIT to exit")
     return
-    
+
   user_response = user_response.lower().strip()
   if len(user_response) == 0:
     addToTextQueue(hero, "Please enter an action or QUIT to exit")
@@ -403,7 +403,7 @@ def playGame(game):
  # Empty the queue.
   hero['textQueue'] = []
   hero['soundQueue'] = None
-  printNow(hero, "\n>>>You entered: "+user_response+"\n")
+  printNow("\n>>> You entered: " + user_response + "\n")
   args = user_response.split()
 
   # Game logic.
@@ -722,6 +722,13 @@ def eventMakeKey(house, items, hero):
 ####
 
 def initialize():
+  """ Utility Function
+  Initialize the game data.
+  Load the assets for the game, and setup the
+  game scene.
+  Returns:
+    The game hash with the game instance.
+  """
   game = {}
   game['house'] = copy.deepcopy(houseMaster)
   game['hero'] = copy.deepcopy(heroMaster)
@@ -749,12 +756,24 @@ def initialize():
   return game
 
 def loadAssets(game):
+  """ Utility Function
+  iterate over all the game assets and load them by type.
+  Args:
+    game (dictionary): The game instance with all the data.
+  """
   allAssets = game['config']['assets']
   for type, assets in allAssets.items():
     for asset in assets:
       loadAsset(asset, type, game)
 
 def loadAsset(name, type, game):
+  """ Utility Function
+  Loads the asset file to the game hash.
+  Args:
+    name (string):     The name of the file to load
+    type (string):     The type of the asset to load.
+    game (dictionary): The game instance with all the data.
+  """
   if not name in game[type]:
     game[type][name] = downloadAsset(type, name)
   
@@ -764,7 +783,7 @@ def downloadAsset(type, name):
     type (string): The type of asset to load (images, sounds).
     name (string): The name of the asset to load.
   """
-  cwd = '' 
+  cwd = ''
   try:
     cwd = tempfile.gettempdir()
   except:
@@ -773,7 +792,7 @@ def downloadAsset(type, name):
       os.mkdir(cwd)
       printNow("Saving files to the local directory: %s" % cwd)
   url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
-  
+
   testfile = urllib.URLopener()
   printNow("Loading now: %s" % (url + name))
   testfile.retrieve(url + name, cwd + name)
@@ -784,12 +803,26 @@ def downloadAsset(type, name):
     return makePicture(cwd + name)
 
 def addToTextQueue(hero, string):
+  """ Utility Function
+  The hero game state, and the string to add.
+  Breakline delimeters are split to produce the array of text.
+  Args:
+    hero (dictionary): The hero instance with all the data.
+    string (string):   The string to add to the queue.
+  """
   parts = string.split('\n')
   for part in parts:
     hero['textQueue'].append(part)
 
 def printTextQueue(game):
-  # 50 Characters and 9 lines is what we're comfortable printing.
+  """ Utility Function
+  Print the all the text that has been queued into a black
+  image with white text.
+  Args:
+    game (dictionary): The game instance with all the data.
+  Returns:
+    The image is with the game text.
+  """
   strings = game['hero']['textQueue']
   textImage = makeEmptyPicture(500, 172, black)
   scene = game['scene']
@@ -800,21 +833,50 @@ def printTextQueue(game):
     origY += 15
   return textImage
 
-def printMoves(game):
+def printStatus(game):
+  """ Utility Function
+  Create an image with the name and status.
+  Args:
+    game (dictionary): The game instance with all the data.
+  Returns:
+    The image is with the game status.
+  """
   textImage = makeEmptyPicture(163, 62, black)
   myFont = makeStyle("Helvetica", Font.BOLD, 12)
   text = "%s (%s/%s)" % (game['hero']['name'], game['hero']['moves'], 50)
   addTextWithStyle(textImage, 15, 40, text, myFont, white)
   return textImage
 
+def printLocation(game):
+  """ Utility Function
+  Create an image with the name and status.
+  Args:
+    game (dictionary): The game instance with all the data.
+  Returns:
+    The image is with the game status.
+  """
+  textImage = makeEmptyPicture(163, 62, black)
+  myFont = makeStyle("Helvetica", Font.BOLD, 20)
+  text = "The %s" % game['hero']['location'].capitalize()
+  addTextWithStyle(textImage, 5, 40, text, myFont, white)
+  return textImage
+
 def isPlaying(game):
+  """ Utility Function
+  Check the state of the hero and return a boolean if true.
+
+  Args:
+    game (dictionary): The game instance with all the data.
+  Returns:
+    boolean, True if the game is active. Otherwise false.
+  """
   state = game['hero']['state']
   return state != 'quit' and state != 'fail' and state != 'success'
 
-def copyImage(image,interface, targetX =0, targetY = 0):   
+def copyImage(image,interface, targetX =0, targetY = 0):
   """
-  This function copies the different pictures to create the game interface. 
-  
+  This function copies the different pictures to create the game interface.
+
   Args:
     image: This is the various image that constitute the interface
     interface: This the empty picuture frame on which to copy the picture to
@@ -826,7 +888,7 @@ def copyImage(image,interface, targetX =0, targetY = 0):
   targetH = getHeight(interface)
   sourceW = getWidth(image)
   sourceH = getHeight(image)
-  
+
   if(targetX > targetW or targetY > targetH):
     return interface
   xMax = min(targetX + sourceW, targetW)
@@ -843,12 +905,11 @@ def copyImage(image,interface, targetX =0, targetY = 0):
   return interface
 
 def renderScene(game):
-  """
-    This function renders the scene as the use moves through various 
-    parts of the house
-    Arg:
-      renderScene(game): This function take current instance of the 
-      game as an argument
+  """ Utility Function
+  Renders the scene as the use moves through various 
+  parts of the house
+  Args:
+    game (dictionary): Current instance of the game.
   """
   #Get the game references
   house = game['house']
@@ -864,8 +925,10 @@ def renderScene(game):
     gameImages = game['images'][roomImage]
     copyImage(gameImages, game['scene'])
     
-    statusImage = printMoves(game)
+    statusImage = printStatus(game)
+    locationImage = printLocation(game)
     copyImage(statusImage, game['scene'], 0, getHeight(gameImages))
+    copyImage(locationImage, game['scene'], 400, getHeight(gameImages))
 
   if hero['flags']['hud']:
     #Gets the current hero inventory
@@ -894,6 +957,11 @@ def renderScene(game):
   repaint(game['scene'])
 
 def playSoundQueue(game):
+  """ Utility Function
+  Play the sound queued in the game.
+  Args:
+    game (dictionary): The game instance with all the data.
+  """
   if (not ('sound_start_ts' in game['config']) or time.time() - game['config']['sound_start_ts'] > game['config']['sound_duration']):
     backgroundSound = game['config']['hud']['assets']['sound']
     sound = game['sounds'][backgroundSound]
