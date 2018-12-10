@@ -237,12 +237,18 @@ itemsMaster = {
       'examine' : "This colorful magic STONE will reset you move count.\nIt looks like you can USE it",
       'use' : "you USE the colorful magic STONE and reset your move count!"
     },
+         'assets' : {      
+      'sound' : 'zapsplat_fantasy_magic_twinkle_burst_002_25774.mp3'
+    },   
     'location' : 'A colorful STONE is in the courtyard.'
   },
   'lever' : {
     'actions' : {
       'examine' : "This mysterious LEVER should open something.\nIt looks like you can USE it",
       'use' : "you USE the mysterious LEVER and open a window! Listen to the owls outside."
+    },
+     'assets' : {      
+      'sound' : 'barred_owl_call_soundbible_com_545143857.mp3'
     },   
     'location' : 'A mysterious LEVER is in the room.'
   },
@@ -256,6 +262,9 @@ itemsMaster = {
     'actions' : {
       'examine' : "This is the china CABINET in the paintiing, which is open.\nYou should CLOSE the cabinet",
       'close' : "You have closed the china CABINET."
+    },
+    'assets' : {      
+      'sound' : 'fox_audio_close_door_medicine_cabinet.mp3'
     }    
   },
   'bookshelf' : {
