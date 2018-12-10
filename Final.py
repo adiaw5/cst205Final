@@ -165,7 +165,7 @@ locked by a skeleton key.
     'events' : [],
     'assets': {
       'image' : 'foyer.jpg',
-      'sound' : '422852__ipaddeh__door-unlocking.wav'
+      'sound' : 'creaky_door_4.wav'
     }
   },
   'laboratory' : {
@@ -335,7 +335,9 @@ def start():
     renderScene(game)
     playSoundQueue(game)
 
-  # <TODO> Cleanup exit function. Should stop music
+  backgroundSound = game['config']['hud']['assets']['sound']
+  sound = game['sounds'][backgroundSound]
+  stopPlaying(sound)
   if  hero['state'] == "success":
     showInformation("%s! You have finally made out of the house! You have won the game, %s!" % (hero['name'], hero['name']))
   elif  hero['state'] == "quit":
@@ -681,15 +683,14 @@ def initialize():
   game['images'] = {}
   game['sounds'] = {}
   loadAssets(game, game)
-  
-  loadAssets(game, game)
 
   # Initialize the scene with dynamic sizes.
-  heroRoom = game['hero']['location']
+  heroLoc = game['hero']['location']
+  heroRoom = game['house'][heroLoc]['assets']['image']
   heroImage = game['images'][heroRoom]
   hudImage = game['images']['hud.jpg']
   game['scene'] = makeEmptyPicture(getWidth(hudImage), getHeight(hudImage) + getHeight(heroImage))
-  hudHeight = getHeight(game['scene']) - getHeight(heroImage)
+  hudHeight = getHeight(game['scene'])
   copyImage(game['images']['hud.jpg'], game['scene'], 0, hudHeight)
 
   # Setup the necessary variables to track the duration of
@@ -795,7 +796,7 @@ def copyImage(image,interface, targetX =0, targetY = 0):
       y += 1
     x += 1
   return interface
-  
+
 def renderScene(game):
   """
     This function renders the scene as the use moves through various 
