@@ -237,20 +237,20 @@ itemsMaster = {
       'examine' : "This colorful magic STONE will reset you move count.\nIt looks like you can USE it",
       'use' : "you USE the colorful magic STONE and reset your move count!"
     },
-         'assets' : {      
-      'sound' : 'zapsplat_fantasy_magic_twinkle_burst_002_25774.mp3'
-    },   
-    'location' : 'A colorful STONE is in the courtyard.'
+    'location' : 'A colorful STONE is in the courtyard.',
+    'assets' : {      
+      'sound' : 'zapsplat_fantasy_magic_twinkle_burst_002_25774.wav'
+    }
   },
   'lever' : {
     'actions' : {
       'examine' : "This mysterious LEVER should open something.\nIt looks like you can USE it",
       'use' : "you USE the mysterious LEVER and open a window! Listen to the owls outside."
     },
-     'assets' : {      
-      'sound' : 'barred_owl_call_soundbible_com_545143857.mp3'
-    },   
-    'location' : 'A mysterious LEVER is in the room.'
+    'location' : 'A mysterious LEVER is in the room.',
+    'assets' : {      
+      'sound' : 'owl-1.wav'
+    }
   },
   'painting' : {
     'actions' : {
@@ -260,11 +260,11 @@ itemsMaster = {
   },
   'cabinet' : {
     'actions' : {
-      'examine' : "This is the china CABINET in the paintiing, which is open.\nYou should CLOSE the cabinet",
+      'examine' : "This is the china CABINET in the PAINTING, which is open.\nYou should CLOSE the cabinet",
       'close' : "You have closed the china CABINET."
     },
     'assets' : {      
-      'sound' : 'fox_audio_close_door_medicine_cabinet.mp3'
+      'sound' : 'fox_audio_close_door_medicine_cabinet.wav'
     }    
   },
   'bookshelf' : {
@@ -339,6 +339,9 @@ configMaster = {
       'creaky_door_4.wav',
       '76175__mattpavone__planetary-flyby-faster.aiff',
       'bensound-ofeliasdream.wav',
+      'fox_audio_close_door_medicine_cabinet.wav',
+      'zapsplat_fantasy_magic_twinkle_burst_002_25774.wav',
+      'owl-1.wav',
     ]
   }
 }
@@ -466,6 +469,8 @@ def doAction(action, object, house, items, hero):
       addToTextQueue(hero, heroRoom[action])
     elif object in heroRoom['items'] and action in items[object]['actions']: 
       addToTextQueue(hero, items[object]['actions'][action])
+      if object == 'cabinet' and hero['location'] == 'ballroom':
+        hero['soundQueue'] = itemsMaster['cabinet']['assets']['sound']
     elif object in hero['inventory'] and action in items[object]['actions']: 
       addToTextQueue(hero, items[object]['actions'][action])
     else:
@@ -651,7 +656,10 @@ def use(house, items, hero, object = False):
         #player uses the magic stone reset move count
         heroRoom['items'].remove(object)
         hero['moves'] = 50
+        hero['soundQueue'] = itemsMaster['stone']['assets']['sound']
         addToTextQueue(hero, "%s, you have 50 moves again!" % hero['name'])
+      elif object == 'lever' and hero['location'] == 'bedroom':
+        hero['soundQueue'] = itemsMaster['lever']['assets']['sound']
     else:
       addToTextQueue(hero, "You cannot USE the %s!" % object)
   else:
