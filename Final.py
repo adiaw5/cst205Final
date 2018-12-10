@@ -294,8 +294,8 @@ configMaster = {
       'image' : 'hud.jpg',
       'sound' : 'bensound-ofeliasdream.wav'
     },
-    'iconPos' : [37, 100],
-    'textPos' : [504, 30],
+    'iconPos' : [173, 18],
+    'textPos' : [26, 87],
   },
   'assets' : {
     'images' : [
@@ -766,9 +766,10 @@ def downloadAsset(type, name):
       os.mkdir(cwd)
       printNow("Saving files to the local directory: %s" % cwd)
   url = "https://raw.githubusercontent.com/adiaw5/cst205Final/master/assets/%s/" % type
+  url = "https://raw.githubusercontent.com/adiaw5/cst205Final/assets2/assets/%s/" % type
   
   testfile = urllib.URLopener()
-  printNow("Loading now: %s" % name)
+  printNow("Loading now: %s" % (url + name))
   testfile.retrieve(url + name, cwd + name)
 
   if type == 'sounds':
@@ -784,7 +785,7 @@ def addToTextQueue(hero, string):
 def printTextQueue(game):
   # 50 Characters and 9 lines is what we're comfortable printing.
   strings = game['hero']['textQueue']
-  textImage = makeEmptyPicture(577, 142, black)
+  textImage = makeEmptyPicture(500, 172, black)
   scene = game['scene']
   origX = 15
   origY = 15
@@ -815,7 +816,7 @@ def copyImage(image,interface, targetX =0, targetY = 0):
   sourceH = getHeight(image)
   
   if(targetX > targetW or targetY > targetH):
-    return target
+    return interface
   xMax = min(targetX + sourceW, targetW)
   yMax = min(targetY + sourceH, targetH)
   x = 0
@@ -842,6 +843,8 @@ def renderScene(game):
   hero = game['hero']
   items = game['items']
   heroRoom = house[hero['location']]
+  imageName = heroRoom['assets']['image']
+  heroImage = game['images'][imageName]
 
   if hero['flags']['map']:
     #Gets the current hero room image
@@ -852,8 +855,8 @@ def renderScene(game):
   if hero['flags']['hud']:
     #Gets the current hero inventory
     inventory = hero['inventory']
-    itemPosX = game['config']['hud']['iconPos'][0]
-    itemPosY = game['config']['hud']['iconPos'][1]
+    itemPosX = game['config']['hud']['iconPos'][0] + getWidth(heroImage)
+    itemPosY = game['config']['hud']['iconPos'][1] + getHeight(heroImage)
 
     #Loops through the item list and copy the existing items to the hud
     for item in inventory:
@@ -863,10 +866,9 @@ def renderScene(game):
       itemPosX += getWidth(image)
 
   textImage = printTextQueue(game)
-  origX = game['config']['hud']['textPos'][0]
-  origY = game['config']['hud']['textPos'][1]
-  origY = getHeight(game['scene']) - getHeight(game['images']['hud.jpg']) + origY
-  copyImage(textImage, game['scene'], origX, origY)
+  x = (getWidth(game['scene']) - getWidth(textImage)) / 2
+  y = getHeight(game['scene']) - getHeight(textImage) - 35
+  copyImage(textImage, game['scene'], x, y)
 
   #Repaints the scene on the current hero location
   hero['flags']['hud'] = False
