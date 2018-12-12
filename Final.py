@@ -310,11 +310,7 @@ configMaster = {
   'assets' : {
     'images' : [
       'Inv_misc_book_11.jpg',
-      'Inv_misc_key_01.jpg',
-      'Inv_misc_key_02.jpg',
-      'Inv_misc_key_03.jpg',
       'Inv_misc_key_04.jpg',
-      'Inv_misc_key_05.jpg',
       'Inv_misc_key_07.jpg',
       'Inv_misc_key_13.jpg',
       'Inv_misc_key_15.jpg',
